@@ -39,47 +39,6 @@ const statusKey = Symbol('status');
 // https://stackoverflow.com/questions/36394479
 const slotMethods = ['valueOf', 'toString', Symbol.toPrimitive];
 
-const proxyMethods = {
-    has(target, name) {
-        if (name === statusKey) {
-            return true;
-        }
-        
-        // Implement `toJSON` for boxed primitives
-        if (name === 'toJSON') {
-            if (target instanceof String || target instanceof Number) {
-                return true;
-            } else {
-                return 'toJSON' in target;
-            }
-        }
-        
-        return target.hasOwnProperty(name);
-    },
-    get(target, name) {
-        if (name === statusKey) {
-            return status;
-        }
-        
-        // Implement `toJSON` for boxed primitives
-        if (name === 'toJSON') {
-            if (target instanceof String) {
-                return () => target.toString();
-            } else if (target instanceof Number) {
-                return () => target.valueOf();
-            } else {
-                return target.toJSON;
-            }
-        }
-        
-        if (name in slotMethods && name in target && target[name] instanceof Function) {
-            return target[name].bind(target);
-        } else {
-            return target[name];
-        }
-    },
-};
-
 const Loadable = (value, { ready = false, loading = false, error = null } = {}) => {
     const status = { ready, loading, error };
     Object.assign(status, {
@@ -99,7 +58,48 @@ const Loadable = (value, { ready = false, loading = false, error = null } = {}) 
         target = new Number(value);
     }
     
-    return new Proxy(target, proxyMethods);
+    // Note: the proxy methods have to be created again for each proxy, because we rely on a
+    // closure to store the `status` of each proxy.
+    return new Proxy(target, {
+        has(target, name) {
+            if (name === statusKey) {
+                return true;
+            }
+            
+            // Implement `toJSON` for boxed primitives
+            if (name === 'toJSON') {
+                if (target instanceof String || target instanceof Number) {
+                    return true;
+                } else {
+                    return 'toJSON' in target;
+                }
+            }
+            
+            return target.hasOwnProperty(name);
+        },
+        get(target, name) {
+            if (name === statusKey) {
+                return status;
+            }
+            
+            // Implement `toJSON` for boxed primitives
+            if (name === 'toJSON') {
+                if (target instanceof String) {
+                    return () => target.toString();
+                } else if (target instanceof Number) {
+                    return () => target.valueOf();
+                } else {
+                    return target.toJSON;
+                }
+            }
+            
+            if (name in slotMethods && name in target && target[name] instanceof Function) {
+                return target[name].bind(target);
+            } else {
+                return target[name];
+            }
+        },
+    });
 };
 
 export const status = statusKey;
