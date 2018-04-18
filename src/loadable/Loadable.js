@@ -70,12 +70,10 @@ const Loadable = (value, { ready = false, loading = false, error = null } = {}) 
             if (name === 'toJSON') {
                 if (target instanceof String || target instanceof Number) {
                     return true;
-                } else {
-                    return 'toJSON' in target;
                 }
             }
             
-            return target.hasOwnProperty(name);
+            return name in target;
         },
         get(target, name) {
             if (name === statusKey) {
