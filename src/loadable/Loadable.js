@@ -102,5 +102,5 @@ const Loadable = (value, { ready = false, loading = false, error = null } = {}) 
     });
 };
 
-export const status = statusKey;
+export { statusKey as status };
 export default Loadable;
