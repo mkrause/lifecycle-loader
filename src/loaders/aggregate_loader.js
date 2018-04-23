@@ -1,6 +1,6 @@
 
 import $msg from 'message-tag';
-import { status } from './loadable/Loadable.js';
+import { status } from '../loadable/Loadable.js';
 
 
 // Aggregated, cached loader. "Aggregated" in that this loader takes a set of loaders for multiple
@@ -31,8 +31,14 @@ const loadItem = ([itemName, itemSpec]) => {
     }
 };
 
+
+/*
+type Loadable = { [status] : any };
+type ItemSpec = { get : () => Loadable, load : () => Promise<Loadable> } };
+*/
+
 // Aggregate multiple loadable items into one item
-// `items` : `{ [itemName] : { get : () => Loadable, load : () => Promise<Loadable> } }`
+// `items : { [itemName] : ItemSpec }`
 const loader = items => {
     // Create a load function that loads all items
     const load = () => Promise.all(Object.entries(items).map(loadItem));

@@ -4,7 +4,7 @@ declare var it : Function;
 
 import chai, { assert, expect } from 'chai';
 
-import Loadable, { status } from '../src/loadable/Loadable.js';
+import Loadable, { status } from '../../src/loadable/Loadable.js';
 
 
 describe('Loadable', () => {
