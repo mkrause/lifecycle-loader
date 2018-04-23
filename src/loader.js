@@ -1,12 +1,16 @@
 
-import { status } from './Loadable.js';
+import $msg from 'message-tag';
+import { status } from './loadable/Loadable.js';
 
+
+// Aggregated, cached loader. "Aggregated" in that this loader takes a set of loaders for multiple
+// items and combines them into one. "Cached" in that we do not re-load unless necessary.
 
 const loadItem = ([itemName, itemSpec]) => {
     const item = itemSpec.get();
     
     if (!(status in item)) {
-        throw new Error('Given item is not loadable: ' + JSON.stringify(item));
+        throw new TypeError($msg`Given item is not loadable: ${item}`);
     }
     
     // TODO
@@ -28,7 +32,7 @@ const loadItem = ([itemName, itemSpec]) => {
 };
 
 // Aggregate multiple loadable items into one item
-// `items` : `{ [itemName]: { get : () => any, load : () => Promise } }`
+// `items` : `{ [itemName] : { get : () => Loadable, load : () => Promise<Loadable> } }`
 const loader = items => {
     // Create a load function that loads all items
     const load = () => Promise.all(Object.entries(items).map(loadItem));
@@ -39,6 +43,8 @@ const loader = items => {
             const item = itemSpec.get();
             statusAcc.ready = statusAcc.ready && item[status].ready;
             statusAcc.loading = statusAcc.loading || item[status].loading;
+            
+            // TODO: consolidate these and just make `error` of type `null | Error | Array<Error>`
             statusAcc.error = statusAcc.error || item[status].error !== null;
             statusAcc.errorMessages[itemName] = item[status].error;
             return statusAcc;

@@ -1,5 +1,5 @@
 
-import Loadable, { status } from '../Loadable.js';
+import Loadable, { status } from '../loadable/Loadable.js';
 
 
 // Create a loader for an item from local storage (stored under the given key).
@@ -12,7 +12,7 @@ export default (storageKey, initial = '') => (current, dispatch) => {
     if (localStorage.hasOwnProperty(storageKey)) {
         try {
             const contents = JSON.parse(localStorage.getItem(storageKey));
-            item = current[status].withReady(contents);
+            item = current[status].asReady(contents);
         } catch (e) {
             if (e instanceof SyntaxError) {
                 item = current[status].withError(error);
@@ -22,7 +22,7 @@ export default (storageKey, initial = '') => (current, dispatch) => {
         }
     } else {
         // Initialize
-        item = current[status].withReady(initial);
+        item = current[status].asReady(initial);
     }
     
     // Update the store
