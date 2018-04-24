@@ -28,10 +28,10 @@ Example:
     const user = Loadable({ name: null });
     user[status]; // ready = false, loading = false, error = false
     
-    const userLoading = user[status].withLoading();
+    const userLoading = user[status].asLoading();
     userLoading[status]; // ready = false, loading = true, error = false
     
-    const userLoaded = userLoading[status].withReady({ name: "John" });
+    const userLoaded = userLoading[status].asReady({ name: "John" });
     userLoaded[status]; // ready = true, loading = false, error = false
 */
 
@@ -42,16 +42,16 @@ const statusMethods = {
     update(updatedStatus) {
         return Loadable(this[originalKey], { ...this[statusKey], ...updatedStatus });
     },
-    invalidated: () => {
+    invalidated() {
         return Loadable(this[originalKey], { ready: false, loading: false, error: null });
     },
-    asReady: valueReady => {
+    asReady(valueReady) {
         return Loadable(valueReady, { ready: true, loading: false, error: null });
     },
-    withLoading: (loading = true) => {
+    asLoading(loading = true) {
         return Loadable(this[originalKey], { ...this[statusKey], loading: true });
     },
-    withError: error => {
+    withError(error) {
         return Loadable(this[originalKey], { ...this[statusKey], loading: false, error });
     },
 };
