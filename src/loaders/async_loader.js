@@ -1,7 +1,7 @@
 
 import status from '../status.js';
 
-import { LoadablePromise } from './loader.js';
+import { LoadablePromise } from '../loader.js';
 
 
 // Trivial asynchronous loader: just resolve with the given constant
