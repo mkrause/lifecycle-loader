@@ -4,7 +4,8 @@ declare var it : Function;
 
 import chai, { assert, expect } from 'chai';
 
-import Loadable, { status } from '../../src/loadable/Loadable.js';
+import status from '../../src/status.js';
+import Loadable from '../../src/loadable/Loadable.js';
 import asyncLoader from '../../src/loaders/async_loader.js';
 
 

@@ -1,5 +1,5 @@
 
-import Loadable, { status } from '../loadable/Loadable.js';
+import Loadable } from '../loadable/Loadable.js';
 
 // Loaders
 import aggregateLoader from '../loaders/aggregate_loader.js';

@@ -1,6 +1,8 @@
 
 import $msg from 'message-tag';
 
+import statusKey from '../status.js';
+
 
 /*
 Loadable: wrapper around arbitrary values (using a Proxy) for asynchronously loaded data. The
@@ -35,7 +37,6 @@ Example:
     userLoaded[status]; // ready = true, loading = false, error = false
 */
 
-const statusKey = Symbol('status');
 const originalKey = Symbol('original');
 
 const statusMethods = {
@@ -51,7 +52,7 @@ const statusMethods = {
     asLoading(loading = true) {
         return Loadable(this[originalKey], { ...this[statusKey], loading: true });
     },
-    withError(error) {
+    asFailed(reason) {
         return Loadable(this[originalKey], { ...this[statusKey], loading: false, error });
     },
 };
@@ -182,5 +183,4 @@ const Loadable = (value, { ready = false, loading = false, error = null } = {}) 
     });
 };
 
-export { statusKey as status };
 export default Loadable;

@@ -1,5 +1,7 @@
 
-import Loadable, { status } from '../loadable/Loadable.js';
+import status from '../status.js';
+
+import { LoadablePromise } from './loader.js';
 
 
 // Create a loader for an item from local storage (stored under the given key).
@@ -19,7 +21,7 @@ export default (storageKey, initial = '') => current => {
             item = current[status].asReady(contents);
         } catch (e) {
             if (e instanceof SyntaxError) {
-                item = current[status].withError(error);
+                item = current[status].asFailed(error);
             } else {
                 throw e; // Unknown error
             }
@@ -29,5 +31,5 @@ export default (storageKey, initial = '') => current => {
         item = current[status].asReady(initial);
     }
     
-    return Promise.resolve(item);
+    return new LoadablePromise(resolve => { resolve(item); }, current);
 };

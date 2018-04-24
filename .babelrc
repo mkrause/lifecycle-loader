@@ -23,12 +23,11 @@
         
         'transform-class-properties',
         'transform-object-rest-spread',
-        //'transform-function-bind',
         
-        // ['transform-builtin-extend', {
-        //     // See: http://stackoverflow.com/questions/33870684/why-doesnt-instanceof-work
-        //     globals: ["Error", "String", "Number", "Array"],
-        // }],
+        ['transform-builtin-extend', {
+            // See: http://stackoverflow.com/questions/33870684/why-doesnt-instanceof-work
+            globals: ['Error', 'String', 'Number', 'Array', 'Promise'],
+        }],
     ],
     
     // Note: we need to duplicate some things below, because env config does not get deep merged
@@ -55,6 +54,11 @@
             plugins: [
                 'transform-class-properties',
                 'transform-object-rest-spread',
+                
+                ['transform-builtin-extend', {
+                    // See: http://stackoverflow.com/questions/33870684/why-doesnt-instanceof-work
+                    globals: ['Error', 'String', 'Number', 'Array', 'Promise'],
+                }],
             ],
         },
         // ES6+ modules
