@@ -58,7 +58,8 @@ const statusMethods = {
 };
 
 const handlerMethods = {
-    // Note: within all of the following, we can assume that `target` is a non-primitive object.
+    // Note: within all of the following, we can assume that `target` is a non-primitive object,
+    // guaranteed by the fact that Proxy targets can only be non-primitive objects.
     
     ownKeys(target) {
         // Note: `ownKeys` should include non-enumerable keys

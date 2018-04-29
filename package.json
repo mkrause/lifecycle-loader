@@ -1,5 +1,5 @@
 {
-    "name": "@mkrause/lifecycle",
+    "name": "@mkrause/lifecycle-loader",
     "version": "0.0.0",
     "description": "Utilities for managing the state lifecycle of async/lazy data",
     "author": "mkrause",
