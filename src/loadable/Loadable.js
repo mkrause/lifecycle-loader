@@ -53,7 +53,7 @@ const statusMethods = {
         return Loadable(this[originalKey], { ...this[statusKey], loading: true });
     },
     asFailed(reason) {
-        return Loadable(this[originalKey], { ...this[statusKey], loading: false, error });
+        return Loadable(this[originalKey], { ...this[statusKey], loading: false, error: reason });
     },
 };
 

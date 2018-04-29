@@ -20,20 +20,12 @@ export type LoaderCreator = (...args : Array<LoaderSpec>) => Loader;
 export class LoadablePromise extends Promise {
     item = null;
     
-    /*
-    static from(item, fulfill) {
-        const promise = new LoadablePromise((resolve, reject) => {
-            fulfill(
-                value => resolve(item[status].asReady(value)),
-                reason => reject(item[status].asFailed(reason)),
-            );
-        });
-        
-        promise.item = item;
-        
-        return promise;
+    // Create from existing promise
+    static from(item, promise) {
+        return new LoadablePromise((resolve, reject) => {
+            promise.then(resolve, reject);
+        }, item);
     }
-    */
     
     constructor(fulfill, item) {
         super((resolve, reject) => {
