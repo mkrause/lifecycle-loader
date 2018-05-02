@@ -19,3 +19,15 @@ interface Loadable = {
     [status] : Status,
 };
 ```
+
+
+## Loader
+
+```js
+import { constLoader } from 'lifecycle-loader';
+
+const loadFortyTwo = constLoader(42);
+
+const fortyTwo = await loadFortyTwo();
+
+```
