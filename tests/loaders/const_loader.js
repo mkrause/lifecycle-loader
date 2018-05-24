@@ -10,7 +10,7 @@ import constLoader from '../../src/loaders/const_loader.js';
 
 
 describe('constLoader', () => {
-    it('should load constant', async () => {
+    it('should load the constant', async () => {
         const load = constLoader(42);
         const itemInitial = Loadable(0);
         

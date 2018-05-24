@@ -1,30 +1,14 @@
+// @flow
 
 import $msg from 'message-tag';
 
 import statusKey from '../status.js';
+import type { Status } from '../status.js';
 
 
 /*
 Loadable: wrapper around arbitrary values (using a Proxy) for asynchronously loaded data. The
 wrapper adds a `status` property that keeps track of the loading state.
-
-Status flags:
-  - ready: indicates whether this item can be used or not (whether the data can be read safely)
-  - loading: indicates whether we are currently in the process of loading this item
-  - error: indicates that loading is done and it resulted in an error
-
-Note that each of the flags is independent, rather than being a linear transition. This is so that
-we can (for example) start loading new data while keeping information such as an error state, for
-UI purposes.
-
-- !ready + !loading + !error     "pending", nothing done yet, not even attempted to load
-- !ready +  loading + !error     "loading", for the first time, no older data available
--  ready + !loading + !error     "idle", can use the data as needed
--  ready +  loading + !error     "reloading", but there is data available in the meantime
-- !ready + !loading +  error     failed, and not yet any attempt to retry (no older data available)
-- !ready +  loading +  error     failed, but we're currently retrying (no older data available)
--  ready + !loading +  error     failed, and not yet any attempt to retry (there is older data available)
--  ready +  loading +  error     failed, but we're currently retrying (there is older data available)
 
 Example:
     const user = Loadable({ name: null });
@@ -36,6 +20,10 @@ Example:
     const userLoaded = userLoading[status].asReady({ name: "John" });
     userLoaded[status]; // ready = true, loading = false, error = false
 */
+
+type LoadableI = {
+    [statusKey] : Status,
+};
 
 const originalKey = Symbol('original');
 
@@ -135,7 +123,7 @@ const handlerMethods = {
     },
 };
 
-const Loadable = (value, { ready = false, loading = false, error = null } = {}) => {
+const Loadable = (value : mixed, { ready = false, loading = false, error = null } : Status = {}) => {
     if (typeof value === 'object' && value && statusKey in value) {
         return value; // Already a Loadable
     }
@@ -158,11 +146,13 @@ const Loadable = (value, { ready = false, loading = false, error = null } = {}) 
         throw new TypeError($msg`Cannot construct Loadable from boolean, given ${value}`);
     } else if (typeof value === 'symbol') {
         throw new TypeError($msg`Cannot construct Loadable from symbol, given ${value}`);
+    } else if (typeof value !== 'object') {
+        throw new TypeError($msg`Cannot construct Loadable, given value of unknown type: ${value}`);
     }
     
     // Note: use `statusMethods` as prototype, rather than adding it directly to the status object,
     // so that the methods are not copied when enumerating.
-    const status = Object.assign(Object.create(statusMethods), { ready, loading, error });
+    const status : Status = Object.assign(Object.create(statusMethods), { ready, loading, error });
     
     // Remember the original value
     Object.defineProperty(status, originalKey, {

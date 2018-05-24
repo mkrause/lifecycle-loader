@@ -14,6 +14,8 @@ export {
     status,
     Loadable,
     LoadablePromise,
+    
+    // Loaders
     aggregateLoader,
     constLoader,
     asyncLoader,
