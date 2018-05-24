@@ -19,3 +19,5 @@ export {
     asyncLoader,
     localStorageLoader,
 };
+
+export const loader = resolver => new LoadablePromise(resolver);

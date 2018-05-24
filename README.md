@@ -67,10 +67,12 @@ A *loader* is a function which returns a `Loadable` item, possibly asynchronousl
 ```js
 import { status, Loadable, loader } from 'lifecycle-loader';
 
+// Create a new loader which just returns a hardcoded result
+const user = Loadable({ name: 'John' });
+const loadUser = loader(resolve => resolve(user));
+
 (async () => {
-    // Create a new loader which just returns a hardcoded result
-    const user = Loadable({ name: 'John' });
-    const loadUser = loader(resolve => resolve(user));
+    // Somewhere in our application
     
     const result = await loadUser();
     
