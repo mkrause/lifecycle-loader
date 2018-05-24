@@ -5,7 +5,7 @@ declare var it : Function;
 import chai, { assert, expect } from 'chai';
 
 import status from '../../src/status.js';
-import Loadable from '../../src/loadable/Loadable.js';
+import Loadable from '../../src/loadable/LoadableProxy.js';
 import constLoader from '../../src/loaders/const_loader.js';
 
 

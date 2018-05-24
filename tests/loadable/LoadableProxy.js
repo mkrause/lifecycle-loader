@@ -5,10 +5,10 @@ declare var it : Function;
 import chai, { assert, expect } from 'chai';
 
 import status from '../../src/status.js';
-import Loadable from '../../src/loadable/Loadable.js';
+import Loadable from '../../src/loadable/LoadableProxy.js';
 
 
-describe('Loadable', () => {
+describe('LoadableProxy', () => {
     describe('construction', () => {
         // Note: cannot use `.to.include.keys(status)` to test for the inclusion of the status property,
         // because chai's `keys` assertion only works for enumerable properties. Use `status in obj` instead.

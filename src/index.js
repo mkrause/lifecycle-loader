@@ -1,6 +1,6 @@
 
 import status from './status.js';
-import Loadable from './loadable/Loadable.js';
+import LoadableProxy from './loadable/LoadableProxy.js';
 import { LoadablePromise } from './loader.js';
 
 // Loaders
@@ -12,7 +12,7 @@ import localStorageLoader from './loaders/localstorage_loader.js';
 
 export {
     status,
-    Loadable,
+    Loadable: LoadableProxy, // Export as just `Loadable`, because of its common use
     LoadablePromise,
     
     // Loaders

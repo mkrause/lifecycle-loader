@@ -1,6 +1,7 @@
 // @flow
 
 import status from './status.js';
+import type { Loadable } from './loadable/Loadable.js';
 
 
 // A *loader* is a function that takes an item (the current state), and returns a promise
