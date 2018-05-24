@@ -68,23 +68,25 @@ A *loader* is a function which returns a `Loadable` item, possibly asynchronousl
 import { status, Loadable, loader } from 'lifecycle-loader';
 
 // Create a new loader (which just returns a hardcoded result)
-const user = Loadable({ name: 'John' });
-const loadUser = loader(resolve => resolve(user));
+const loadUser = user => loader(user, resolve => resolve({ name: 'John' }));
 
 (async () => {
     // Somewhere in our application
+    const user = Loadable(); // The item (currently empty)
+    user[status].ready === false;
     
-    const result = await loadUser();
+    await loadUser(user);
     
-    result.name === 'John';
-    result[status].ready === true;
+    user.name === 'John';
+    user[status].ready === true;
 })();
 ```
 
 Due to the blocking nature of `await`, the above does not give us the opportunity to handle a "loading" state. If we want to handle that as well, then we can just fall back to promises:
 
 ```js
-loadUser()
+const user = Loadable();
+loadUser(user)
     .then(user => {
         user[status].ready === true;
     })

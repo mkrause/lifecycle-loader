@@ -22,4 +22,4 @@ export {
     localStorageLoader,
 };
 
-export const loader = resolver => new LoadablePromise(resolver);
+export const loader = (item, resolver) => new LoadablePromise(resolver, item);
