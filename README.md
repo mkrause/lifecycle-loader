@@ -75,10 +75,10 @@ const loadUser = user => loader(user, resolve => resolve({ name: 'John' }));
     const user = Loadable(); // The item (currently empty)
     user[status].ready === false;
     
-    await loadUser(user);
+    const userLoaded = await loadUser(user);
     
-    user.name === 'John';
-    user[status].ready === true;
+    userLoaded.name === 'John';
+    userLoaded[status].ready === true;
 })();
 ```
 
