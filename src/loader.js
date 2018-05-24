@@ -1,6 +1,7 @@
 // @flow
 
 import status from './status.js';
+import type { Status } from './status.js';
 import type { Loadable } from './loadable/Loadable.js';
 
 
@@ -48,6 +49,7 @@ export class LoadablePromise extends Promise {
     // one function which is called regardless of the result (check the `status` instead).
     subscribe(subscriber) {
         let fulfilled = false;
+        
         const promise = this.then(
             itemReady => {
                 fulfilled = true;
@@ -59,6 +61,9 @@ export class LoadablePromise extends Promise {
             },
         );
         
+        // FIXME: likely doesn't work as expected. `fulfilled` should never be true here, because `.then()`
+        // is always schedules async. Possible solution: run the `fulfill` function ourselves and extract the
+        // value synchronously.
         if (!fulfilled) {
             subscriber(this.item[status].asLoading());
         }
