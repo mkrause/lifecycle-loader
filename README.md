@@ -80,3 +80,18 @@ const loadUser = loader(resolve => resolve(user));
     result[status].ready === true;
 })();
 ```
+
+Due to the blocking nature of `await`, the above does not give us the opportunity to handle a "loading" state. If we want to handle that as well, then we can just fall back to promises:
+
+```js
+loadUser()
+    .then(user => {
+        user[status].ready === true;
+    })
+    .catch(error => {
+        user[status].error === error;
+    });
+
+// Loading
+user[status].loading === true;
+```
