@@ -32,7 +32,7 @@ A *status* is an object that describes the current loading state of some item. I
 Note that any combination of these three values is a valid status. For example, consider `ready: true` and `loading: true`. That means the we already have a valid item (that can be shown in the UI for instance), but we are also loading the item to get a newer version. In other words we're doing a reload.
 
 
-** Loadable **
+**Loadable**
 
 A status may be kept separate from the item that is being loaded. Usually this is what applications do and it makes sense. However, it is often convenient to keep the status in the same place as the item itself. If your state is a large tree hierarchy, then it may be cumbersome to have to manage the item and the status separately.
 
@@ -60,7 +60,7 @@ loadableDate.getFullYear(); // 2018
 ```
 
 
-** Loader **
+**Loader**
 
 A *loader* is a function which returns a `Loadable` item, possibly asynchronously. It's similar to any regular `async` function in JavaScript (and in fact can be used using `await`), except that it keeps track of the `status` while the load process runs.
 
