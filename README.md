@@ -72,7 +72,7 @@ const loadUser = user => loader(user, resolve => resolve({ name: 'John' }));
 
 (async () => {
     // Somewhere in our application
-    const user = Loadable(); // The item (currently empty)
+    const user = Loadable(null); // The item (currently empty)
     user[status].ready === false;
     
     const userLoaded = await loadUser(user);
@@ -85,7 +85,7 @@ const loadUser = user => loader(user, resolve => resolve({ name: 'John' }));
 Due to the blocking nature of `await`, the above does not give us the opportunity to handle a "loading" state. If we want to handle that as well, then we can just fall back to promises:
 
 ```js
-const user = Loadable();
+const user = Loadable(null);
 loadUser(user)
     .then(user => {
         user[status].ready === true;
