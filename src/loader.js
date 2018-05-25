@@ -15,6 +15,20 @@ type LoaderSpec = mixed;
 export type LoaderCreator = (...args : Array<LoaderSpec>) => Loader;
 
 
+class LoadError extends Error {
+    constructor(reason : mixed, loadable : Loadable) {
+        let message = '';
+        if (reason instanceof Error) {
+            message = reason.message;
+        } else {
+            message = String(message);
+        }
+        
+        super('Loading failed: ' + reason);
+        this.loadable = loadable;
+    }
+}
+
 // Extended version of `Promise` that works with loadable items.
 // Note: although the ES6 spec allows extending Promise, babel by default does not support
 // it. transform-builtin-extend must be configured to enable this.
@@ -33,7 +47,7 @@ export class LoadablePromise extends Promise {
         super((resolve, reject) => {
             fulfill(
                 value => resolve(item[status].asReady(value)),
-                reason => reject(item[status].asFailed(reason)),
+                reason => reject(new LoadError(reason, item[status].asFailed(reason))),
             );
         });
         
