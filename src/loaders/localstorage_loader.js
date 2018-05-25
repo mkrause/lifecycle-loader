@@ -15,9 +15,9 @@ export default (storageKey, initial = '') => current => {
     }
     
     let item;
-    if (localStorage.hasOwnProperty(storageKey)) {
+    if (window.localStorage.hasOwnProperty(storageKey)) {
         try {
-            const contents = JSON.parse(localStorage.getItem(storageKey));
+            const contents = JSON.parse(window.localStorage.getItem(storageKey));
             item = current[status].asReady(contents);
         } catch (e) {
             if (e instanceof SyntaxError) {

@@ -12,7 +12,7 @@ import localStorageLoader from './loaders/localstorage_loader.js';
 
 export {
     status,
-    Loadable: LoadableProxy, // Export as just `Loadable`, because of its common use
+    LoadableProxy as Loadable, // Export as just `Loadable`, because of its common use
     LoadablePromise,
     
     // Loaders
