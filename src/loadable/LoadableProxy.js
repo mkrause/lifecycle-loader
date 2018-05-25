@@ -47,8 +47,12 @@ const statusMethods = {
     
     // Facilitate reference equality checking
     is(other : mixed) {
-        if (statusKey in other) {
-            return this[originalKey] === other[statusKey][originalKey];
+        if (typeof other === 'object' && other && statusKey in other) {
+            // $FlowFixMe: no symbol support
+            if (typeof other[statusKey] === 'object' && other[statusKey] && originalKey in other[statusKey]) {
+                // $FlowFixMe: no symbol support
+                return this[originalKey] === other[statusKey][originalKey];
+            }
         }
         return this[originalKey] === other;
     },
