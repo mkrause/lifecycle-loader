@@ -30,19 +30,27 @@ const statusMethods = {
         return LoadableProxy(this[originalKey], status);
     },
     update(updatedStatus : Status) {
-        return LoadableProxy(this[originalKey], { ...this[statusKey], ...updatedStatus });
+        return LoadableProxy(this[originalKey], { ...this, ...updatedStatus });
     },
     invalidated() {
-        return LoadableProxy(this[originalKey], { ...this[statusKey], ready: false, loading: false, error: null });
+        return LoadableProxy(this[originalKey], { ...this, ready: false, loading: false, error: null });
     },
     asReady(valueReady) {
-        return LoadableProxy(valueReady, { ...this[statusKey], ready: true, loading: false, error: null });
+        return LoadableProxy(valueReady, { ...this, ready: true, loading: false, error: null });
     },
     asLoading(loading = true) {
-        return LoadableProxy(this[originalKey], { ...this[statusKey], loading: true });
+        return LoadableProxy(this[originalKey], { ...this, loading: true });
     },
     asFailed(reason) {
-        return LoadableProxy(this[originalKey], { ...this[statusKey], loading: false, error: reason });
+        return LoadableProxy(this[originalKey], { ...this, loading: false, error: reason });
+    },
+    
+    // Facilitate reference equality checking
+    is(other : mixed) {
+        if (statusKey in other) {
+            return this[originalKey] === other[statusKey][originalKey];
+        }
+        return this[originalKey] === other;
     },
 };
 
