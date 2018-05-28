@@ -1,7 +1,9 @@
 
 import status from './status.js';
+import type { Status } from './status.js';
+import type { Loadable } from './loadable/Loadable.js';
 import LoadableProxy from './loadable/LoadableProxy.js';
-import { LoadablePromise } from './loader.js';
+import { LoadError, LoadablePromise } from './loader.js';
 
 // Loaders
 import aggregateLoader from './loaders/aggregate_loader.js';
@@ -13,6 +15,7 @@ import localStorageLoader from './loaders/localstorage_loader.js';
 export {
     status,
     LoadableProxy as Loadable, // Export as just `Loadable`, because of its common use
+    LoadError,
     LoadablePromise,
     
     // Loaders
@@ -23,3 +26,5 @@ export {
 };
 
 export const loader = (item, resolver) => new LoadablePromise(resolver, item);
+
+export type { Status, Loadable as LoadableT };

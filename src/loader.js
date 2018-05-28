@@ -15,8 +15,8 @@ type LoaderSpec = mixed;
 export type LoaderCreator = (...args : Array<LoaderSpec>) => Loader;
 
 
-class LoadError extends Error {
-    constructor(reason : mixed, loadable : Loadable) {
+export class LoadError extends Error {
+    constructor(reason : mixed, item : Loadable) {
         let message = '';
         if (reason instanceof Error) {
             message = reason.message;
@@ -25,7 +25,7 @@ class LoadError extends Error {
         }
         
         super('Loading failed: ' + reason);
-        this.loadable = loadable;
+        this.item = item;
     }
 }
 
@@ -33,8 +33,13 @@ class LoadError extends Error {
 // Note: although the ES6 spec allows extending Promise, babel by default does not support
 // it. transform-builtin-extend must be configured to enable this.
 // https://github.com/babel/babel/issues/1120
+// 
+// Note: should extending Promise become an issue, we could always fall back to just implementing
+// "thenable".
 export class LoadablePromise extends Promise {
-    item = null;
+    // Set the species to regular `Promise`, so that `then()` chaining will not try to create
+    // a new ApiPromise (which fails due to lack of information given to the constructor).
+    static [Symbol.species] = Promise;
     
     // Create from existing promise
     static from(item, promise) {
@@ -42,6 +47,8 @@ export class LoadablePromise extends Promise {
             promise.then(resolve, reject);
         }, item);
     }
+    
+    item = null;
     
     constructor(fulfill, item) {
         super((resolve, reject) => {
