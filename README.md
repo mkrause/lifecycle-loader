@@ -91,7 +91,7 @@ loadUser(user)
         user[status].ready === true;
     })
     .catch(error => {
-        user[status].error === error;
+        user[status].error !== null;
     });
 
 // Loading
