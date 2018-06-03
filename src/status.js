@@ -7,9 +7,9 @@ Status flags:
   - loading: indicates whether we are currently in the process of loading this item
   - error: indicates that the last load attempt resulted in an error
 
-Note that each of the flags is independent, rather than being a linear transition. This is so that
-we can (for example) start loading new data while keeping information such as an error state, for
-UI purposes.
+Note that each of the flags is independent, rather than being a linear transition (e.g. loading -> ready).
+This is so that we can (for example) start loading new data while keeping information such as an error
+state, for UI purposes.
 
 - !ready + !loading + !error     "pending", nothing done yet, not even attempted to load
 - !ready +  loading + !error     "loading", for the first time, no older data available

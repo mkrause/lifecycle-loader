@@ -4,7 +4,7 @@
 
 [ignore]
 <PROJECT_ROOT>/lib-esm/.*
-<PROJECT_ROOT>/lib-cjs/.*
+#<PROJECT_ROOT>/lib-cjs/.*
 
 
 [libs]

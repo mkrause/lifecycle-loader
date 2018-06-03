@@ -35,13 +35,13 @@ const statusMethods = {
     invalidated() {
         return LoadableProxy(this[originalKey], { ...this, ready: false, loading: false, error: null });
     },
-    asReady(valueReady) {
+    asReady(valueReady : mixed) {
         return LoadableProxy(valueReady, { ...this, ready: true, loading: false, error: null });
     },
     asLoading(loading = true) {
         return LoadableProxy(this[originalKey], { ...this, loading: true });
     },
-    asFailed(reason) {
+    asFailed(reason : Error) {
         return LoadableProxy(this[originalKey], { ...this, loading: false, error: reason });
     },
     

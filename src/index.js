@@ -9,7 +9,7 @@ import { LoadError, LoadablePromise } from './loader.js';
 import aggregateLoader from './loaders/aggregate_loader.js';
 import constLoader from './loaders/const_loader.js';
 import asyncLoader from './loaders/async_loader.js';
-import localStorageLoader from './loaders/localstorage_loader.js';
+import webStorageLoader from './loaders/webstorage_loader.js';
 
 
 export {
@@ -22,7 +22,7 @@ export {
     aggregateLoader,
     constLoader,
     asyncLoader,
-    localStorageLoader,
+    webStorageLoader,
 };
 
 export const loader = (item, resolver) => new LoadablePromise(resolver, item);

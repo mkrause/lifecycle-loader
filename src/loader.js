@@ -29,6 +29,8 @@ export class LoadError extends Error {
     }
 }
 
+type Fulfill = (mixed => void, mixed => void) => void;
+
 // Extended version of `Promise` that works with loadable items.
 // Note: although the ES6 spec allows extending Promise, babel by default does not support
 // it. transform-builtin-extend must be configured to enable this.
@@ -42,7 +44,7 @@ export class LoadablePromise extends Promise {
     static [Symbol.species] = Promise;
     
     // Create from existing promise
-    static from(item, promise) {
+    static from(item : Loadable, promise : typeof Promise) : LoadablePromise {
         return new LoadablePromise((resolve, reject) => {
             promise.then(resolve, reject);
         }, item);
@@ -50,11 +52,11 @@ export class LoadablePromise extends Promise {
     
     item = null;
     
-    constructor(fulfill, item) {
+    constructor(fulfill : Fulfill, item : Loadable) {
         super((resolve, reject) => {
             fulfill(
-                value => resolve(item[status].asReady(value)),
-                reason => reject(new LoadError(reason, item[status].asFailed(reason))),
+                value => { resolve(item[status].asReady(value)); },
+                reason => { reject(new LoadError(reason, item[status].asFailed(reason))); },
             );
         });
         
@@ -68,7 +70,7 @@ export class LoadablePromise extends Promise {
     //   corresponding state (ready/failed).
     // In addition, `subscribe` does not distinguish between resolved/reject, it only takes
     // one function which is called regardless of the result (check the `status` instead).
-    subscribe(subscriber) {
+    subscribe(subscriber : Loadable => void) : LoadablePromise {
         let fulfilled = false;
         
         const promise = this.then(
