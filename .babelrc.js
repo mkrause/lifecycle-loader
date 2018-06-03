@@ -6,8 +6,7 @@ module.exports = {
         '@babel/flow',
         ['@babel/env', {
             targets: {
-                node: '8.0',
-                browsers: ['>0.25%', 'not dead'],
+                node: '6.9', // LTS (Boron)
             },
             
             // Whether to transpile modules
