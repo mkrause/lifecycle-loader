@@ -7,6 +7,7 @@ module.exports = {
         ['@babel/env', {
             targets: {
                 node: '6.9', // LTS (Boron)
+                browsers: ['>0.25%', 'not dead'],
             },
             
             // Whether to transpile modules
