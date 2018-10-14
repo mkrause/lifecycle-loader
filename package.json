@@ -22,22 +22,22 @@
         "prepublishOnly": "npm run build:esm && npm run build:cjs && cp flow/index.js.flow lib-cjs"
     },
     "devDependencies": {
-        "@babel/core": "^7.0.0-beta.49",
-        "@babel/cli": "^7.0.0-beta.49",
-        "@babel/register": "^7.0.0-beta.49",
-        "@babel/plugin-proposal-class-properties": "^7.0.0-beta.49",
-        "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.49",
+        "@babel/core": "^7.1.2",
+        "@babel/cli": "^7.1.2",
+        "@babel/register": "^7.0.0",
+        "@babel/plugin-proposal-class-properties": "^7.1.0",
+        "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
         "babel-plugin-transform-builtin-extend": "^1.1.2",
-        "@babel/preset-env": "^7.0.0-beta.49",
-        "@babel/preset-flow": "^7.0.0-beta.49",
-        "flow-bin": "^0.73.0",
-        "flow-copy-source": "^1.3.0",
+        "@babel/preset-env": "^7.1.0",
+        "@babel/preset-flow": "^7.0.0",
+        "flow-bin": "^0.83.0",
+        "flow-copy-source": "^2.0.2",
         "mocha": "^5.2.0",
-        "chai": "^4.1.2"
+        "chai": "^4.2.0"
     },
     "dependencies": {
-        "lodash": "^4.17.10",
-        "immutable": "^4.0.0-rc.9",
+        "lodash": "^4.17.11",
+        "immutable": "^4.0.0-rc.10",
         "message-tag": "^0.2.2"
     }
 }
