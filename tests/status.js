@@ -9,6 +9,7 @@ import statusKey from '../src/status.js';
 
 describe('status', () => {
     it('should expose a unique status symbol', () => {
-        expect(statusKey.toString()).to.equal('Symbol(status)');
+        // expect(statusKey.toString()).to.equal('Symbol(status)');
+        expect(statusKey).to.equal('__status__');
     });
 });
