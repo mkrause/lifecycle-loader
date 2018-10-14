@@ -1,3 +1,4 @@
+// @flow
 
 import status from './status.js';
 import type { Status } from './status.js';

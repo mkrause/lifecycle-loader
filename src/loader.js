@@ -1,13 +1,12 @@
 // @flow
 
-import status from './status.js';
-import type { Status } from './status.js';
-import type { Loadable } from './loadable/Loadable.js';
+import status, { type Status } from './status.js';
+import { type Loadable } from './loadable/Loadable.js';
 
 
-// A *loader* is a function that takes an item (the current state), and returns a promise
-// for that item (re)loaded. To create a loader, a loader creator may be used to build a
-// loader function from some specification.
+// A *loader* is a function that takes an item (the current state), and returns a promise for
+// a new (loaded) item. To create such a loader, a loader creator may be used to build a loader
+// function from a given specification.
 
 export type Loader = Loadable => Promise<Loadable>;
 
@@ -24,7 +23,7 @@ export class LoadError extends Error {
             message = String(message);
         }
         
-        super('Loading failed: ' + reason);
+        super('Loading failed: ' + message);
         this.item = item;
     }
 }
@@ -37,7 +36,7 @@ type Fulfill = (mixed => void, mixed => void) => void;
 // https://github.com/babel/babel/issues/1120
 // 
 // Note: should extending Promise become an issue, we could always fall back to just implementing
-// "thenable".
+// the "thenable" interface (i.e. just a method named `then()`).
 export class LoadablePromise extends Promise {
     // Set the species to regular `Promise`, so that `then()` chaining will not try to create
     // a new ApiPromise (which fails due to lack of information given to the constructor).
@@ -85,7 +84,7 @@ export class LoadablePromise extends Promise {
         );
         
         // FIXME: likely doesn't work as expected. `fulfilled` should never be true here, because `.then()`
-        // is always schedules async. Possible solution: run the `fulfill` function ourselves and extract the
+        // is always scheduled async. Possible solution: run the `fulfill` function ourselves and extract the
         // value synchronously.
         if (!fulfilled) {
             subscriber(this.item[status].asLoading());
