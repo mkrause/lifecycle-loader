@@ -2,14 +2,12 @@
 
 import $msg from 'message-tag';
 
-import statusKey from '../status.js';
-import type { Status } from '../status.js';
-
-import type { Loadable } from './Loadable.js';
+import statusKey, { type Status } from '../interfaces/status.js';
+import { type Loadable } from '../interfaces/Loadable.js';
 
 
 /*
-LoadableProxy: create a Loadable using a Proxy, which keeps everything from the original object in tact
+LoadableProxy: create a Loadable using a Proxy, which keeps everything from the original object intact
 (as far as possible), while adding the `status` property.
 
 Example:
@@ -60,7 +58,7 @@ const statusMethods = {
 
 const handlerMethods = {
     // Note: within all of the following, we can assume that `target` is a non-primitive object,
-    // guaranteed by the fact that Proxy targets can only be non-primitive objects.
+    // guaranteed by the fact that in JS a Proxy target must be a non-primitive object.
     
     ownKeys(target) {
         // Note: `ownKeys` should include non-enumerable keys

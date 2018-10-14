@@ -1,10 +1,12 @@
 // @flow
 
-import status from './status.js';
-import type { Status } from './status.js';
-import type { Loadable } from './loadable/Loadable.js';
+import statusKey, { type Status } from './interfaces/status.js';
+import type { Loadable } from './interfaces/loadable.js';
+import { type Loader, LoadError, LoadablePromise } from './interfaces/loader.js';
+
+// Loadable utilities
 import LoadableProxy from './loadable/LoadableProxy.js';
-import { LoadError, LoadablePromise } from './loader.js';
+import loadableFromStatus from './loadable/fromStatus.js';
 
 // Loaders
 import aggregateLoader from './loaders/aggregate_loader.js';
@@ -14,7 +16,7 @@ import webStorageLoader from './loaders/webstorage_loader.js';
 
 
 export {
-    status,
+    statusKey as status,
     LoadableProxy as Loadable, // Export as just `Loadable`, because of its common use
     LoadError,
     LoadablePromise,

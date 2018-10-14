@@ -1,6 +1,6 @@
 
 import $msg from 'message-tag';
-import status from '../status.js';
+import status from '../interfaces/status.js';
 
 
 // Aggregated, cached loader. "Aggregated" in that this loader takes a set of loaders for multiple

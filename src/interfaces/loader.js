@@ -1,7 +1,7 @@
 // @flow
 
 import status, { type Status } from './status.js';
-import { type Loadable } from './loadable/Loadable.js';
+import { type Loadable } from './Loadable.js';
 
 
 // A *loader* is a function that takes an item (the current state), and returns a promise for
@@ -32,14 +32,14 @@ type Fulfill = (mixed => void, mixed => void) => void;
 
 // Extended version of `Promise` that works with loadable items.
 // Note: although the ES6 spec allows extending Promise, babel by default does not support
-// it. transform-builtin-extend must be configured to enable this.
+// it. `transform-builtin-extend` can be used to enable this.
 // https://github.com/babel/babel/issues/1120
 // 
 // Note: should extending Promise become an issue, we could always fall back to just implementing
 // the "thenable" interface (i.e. just a method named `then()`).
 export class LoadablePromise extends Promise {
     // Set the species to regular `Promise`, so that `then()` chaining will not try to create
-    // a new ApiPromise (which fails due to lack of information given to the constructor).
+    // a new LoadablePromise (which fails due to lack of information given to the constructor).
     static [Symbol.species] = Promise;
     
     // Create from existing promise
@@ -53,6 +53,8 @@ export class LoadablePromise extends Promise {
     
     constructor(fulfill : Fulfill, item : Loadable) {
         super((resolve, reject) => {
+            // FIXME: we assume support for status methods (like `asReady`) below, but these are not
+            // guaranteed to exist
             fulfill(
                 value => { resolve(item[status].asReady(value)); },
                 reason => { reject(new LoadError(reason, item[status].asFailed(reason))); },

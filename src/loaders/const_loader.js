@@ -1,7 +1,7 @@
 
-import status from '../status.js';
+import status from '../interfaces/status.js';
 
-import { LoadablePromise } from '../loader.js';
+import { LoadablePromise } from '../interfaces/loader.js';
 
 
 // Trivial synchronous loader: just resolve with the given constant

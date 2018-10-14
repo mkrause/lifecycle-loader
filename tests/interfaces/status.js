@@ -4,7 +4,7 @@ declare var it : Function;
 
 import chai, { assert, expect } from 'chai';
 
-import statusKey from '../src/status.js';
+import statusKey from '../../src/interfaces/status.js';
 
 
 describe('status', () => {

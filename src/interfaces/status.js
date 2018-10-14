@@ -28,5 +28,6 @@ export type Status = {
     error : ?Error,
 };
 
+// A unique key that can be used to get the status of some item
 // export default Symbol('status');
-export default '__status__';
+export default '__status__'; // XXX workaround for nonunique symbol import issue (duplicate packages)
