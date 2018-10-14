@@ -28,4 +28,5 @@ export type Status = {
     error : ?Error,
 };
 
-export default Symbol('status');
+// export default Symbol('status');
+export default '__status__';
