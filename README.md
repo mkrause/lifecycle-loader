@@ -29,7 +29,7 @@ A *status* is an object that describes the current loading state of some item. I
 * `loading`: Whether or not we are currently in the process of loading (or reloading) the item.
 * `error`: Whether there has been an error. Either `null` (no error), or some JS `Error` instance.
 
-Note that any combination of these three properties is a valid status. For example, consider `ready: true` and `loading: true`. That means the we already have a valid item (that can be shown in the UI for instance), but we are also loading the item to get a newer version. In other words we're doing a reload. A complete list of possible combinations and their interpretations can be found [here](https://github.com/mkrause/lifecycle-loader/blob/master/src/status.js).
+Note that any combination of these three properties is a valid status. For example, consider `ready: true` and `loading: true`. That means the we already have a valid item (that can be shown in the UI for instance), but we are also loading the item to get a newer version. In other words we're doing a reload. A complete list of possible combinations and their interpretations can be found [here](https://github.com/mkrause/lifecycle-loader/blob/master/src/interfaces/status.js).
 
 
 **Loadable**
