@@ -36,7 +36,6 @@
     },
     "dependencies": {
         "lodash": "^4.17.15",
-        "immutable": "^4.0.0-rc.12",
         "message-tag": "^0.3.0"
     }
 }
