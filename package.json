@@ -1,6 +1,6 @@
 {
     "name": "@mkrause/lifecycle-loader",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Utilities for managing the state lifecycle of async loaded data",
     "author": "mkrause",
     "license": "MIT",
