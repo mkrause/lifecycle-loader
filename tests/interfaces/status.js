@@ -1,15 +1,12 @@
-// @flow
-declare var describe : Function;
-declare var it : Function;
 
 import chai, { assert, expect } from 'chai';
 
-import statusKey from '../../src/interfaces/status.js';
+import statusKey from '../../lib-esm/interfaces/status.js';
 
 
 describe('status', () => {
     it('should expose a unique status symbol', () => {
-        // expect(statusKey.toString()).to.equal('Symbol(status)');
-        expect(statusKey).to.equal('__status__');
+        expect(typeof statusKey).to.equal('symbol');
+        expect(statusKey.description).to.equal('lifecycle.status');
     });
 });

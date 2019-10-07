@@ -1,11 +1,8 @@
-// @flow
-declare var describe : Function;
-declare var it : Function;
 
 import chai, { assert, expect } from 'chai';
 
-import status from '../../src/interfaces/status.js';
-import Loadable from '../../src/loadable/LoadableProxy.js';
+import status from '../../lib-esm/interfaces/status.js';
+import Loadable from '../../lib-esm/loadable/LoadableProxy.js';
 
 
 describe('LoadableProxy', () => {
