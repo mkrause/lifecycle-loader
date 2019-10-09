@@ -1,10 +1,8 @@
-// @flow
 
 import $msg from 'message-tag';
 
-import statusKey, { type Status } from '../interfaces/status.js';
-import { itemKey as originalKey } from '../interfaces/loadable.js';
-import { type Loadable } from '../interfaces/loadable.js';
+import { statusKey, Status } from '../interfaces/status.js';
+import { itemKey, Loadable } from '../interfaces/loadable.js';
 
 
 /*
@@ -24,34 +22,34 @@ Example:
 
 const statusMethods = {
     withStatus(status : Status) {
-        return LoadableProxy(this[originalKey], status);
+        return LoadableProxy(this[itemKey], status);
     },
     update(updatedStatus : Status) {
-        return LoadableProxy(this[originalKey], { ...this, ...updatedStatus });
+        return LoadableProxy(this[itemKey], { ...this, ...updatedStatus });
     },
     invalidated() {
-        return LoadableProxy(this[originalKey], { ...this, ready: false, loading: false, error: null });
+        return LoadableProxy(this[itemKey], { ...this, ready: false, loading: false, error: null });
     },
-    asReady(valueReady : mixed) {
+    asReady(valueReady : unknown) {
         return LoadableProxy(valueReady, { ...this, ready: true, loading: false, error: null });
     },
     asLoading(loading = true) {
-        return LoadableProxy(this[originalKey], { ...this, loading: true });
+        return LoadableProxy(this[itemKey], { ...this, loading: true });
     },
     asFailed(reason : Error) {
-        return LoadableProxy(this[originalKey], { ...this, loading: false, error: reason });
+        return LoadableProxy(this[itemKey], { ...this, loading: false, error: reason });
     },
     
     // Facilitate reference equality checking
-    is(other : mixed) {
+    is(other : unknown) {
         if (typeof other === 'object' && other && statusKey in other) {
             // $FlowFixMe: no symbol support
-            if (typeof other[statusKey] === 'object' && other[statusKey] && originalKey in other[statusKey]) {
+            if (typeof other[statusKey] === 'object' && other[statusKey] && itemKey in other[statusKey]) {
                 // $FlowFixMe: no symbol support
-                return this[originalKey] === other[statusKey][originalKey];
+                return this[itemKey] === other[statusKey][itemKey];
             }
         }
-        return this[originalKey] === other;
+        return this[itemKey] === other;
     },
 };
 
@@ -133,7 +131,7 @@ const handlerMethods = {
     },
 };
 
-const LoadableProxy = (value : mixed, { ready = false, loading = false, error = null } : Status = {}) => {
+const LoadableProxy = (value : unknown, { ready = false, loading = false, error = null } : Status = {}) => {
     if (typeof value === 'object' && value !== null && statusKey in value) {
         return value; // Already a Loadable
     }
@@ -145,10 +143,10 @@ const LoadableProxy = (value : mixed, { ready = false, loading = false, error = 
     // Handle some primitives (values that cannot be proxied)
     if (target === undefined) {
         throw new TypeError($msg`Cannot construct Loadable, given \`undefined\``);
-    } if (target === null) {
+    } else if (target === null) {
         // Interpret null values as "empty", simulate by using an empty object
         target = {};
-    } if (typeof value === 'string') {
+    } else if (typeof value === 'string') {
         target = new String(value);
     } else if (typeof value === 'number') {
         target = new Number(value);
@@ -165,7 +163,7 @@ const LoadableProxy = (value : mixed, { ready = false, loading = false, error = 
     const status : Status = Object.assign(Object.create(statusMethods), { ready, loading, error });
     
     // Remember the original value
-    Object.defineProperty(status, originalKey, {
+    Object.defineProperty(status, itemKey, {
         value,
         enumerable: false,
     });
@@ -184,6 +182,7 @@ const LoadableProxy = (value : mixed, { ready = false, loading = false, error = 
     });
 };
 
+/*
 LoadableProxy.fromPromise = async (promise, subscriber = () => {}) => {
     subscriber(LoadableProxy(null, { loading: true }));
     
@@ -210,7 +209,7 @@ LoadableProxy.fromPromise = async (promise, subscriber = () => {}) => {
 LoadableProxy.fromPromiseWithCache = async (item, promise, subscriber = () => {}) => {
     // We can only work with items that have been constructed using `LoadablyProxy`, otherwise
     // we don't have a standard way to access the underlying item.
-    if (!(originalKey in item)) {
+    if (!(itemKey in item)) {
         throw new TypeError($msg`Expected LoadableProxy, given ${item}`);
     }
     
@@ -235,5 +234,6 @@ LoadableProxy.fromPromiseWithCache = async (item, promise, subscriber = () => {}
         return loadable;
     }
 };
+*/
 
 export default LoadableProxy;
