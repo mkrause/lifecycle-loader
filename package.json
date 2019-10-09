@@ -29,9 +29,11 @@
         "babel-plugin-transform-builtin-extend": "^1.1.2",
         "@babel/preset-env": "^7.6.2",
         "@babel/preset-flow": "^7.0.0",
+        "@babel/preset-typescript": "^7.6.0",
         "flow-bin": "^0.83.0",
         "flow-copy-source": "^2.0.8",
         "typescript": "^3.6.3",
+        "@types/node": "^12.7.12",
         "mocha": "^6.2.1",
         "chai": "^4.2.0"
     },

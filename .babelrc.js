@@ -3,6 +3,7 @@ const env = process.env.BABEL_ENV || 'esm';
 
 module.exports = {
     presets: [
+        '@babel/typescript',
         '@babel/flow',
         ['@babel/env', {
             targets: {

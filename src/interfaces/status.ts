@@ -1,5 +1,3 @@
-// @flow
-
 /*
 A *status* is an object that describes the current loading state of some application state.
 
@@ -25,9 +23,12 @@ state, for UI purposes. All the possible combinations listed below.
 export type Status = {
     ready : boolean,
     loading : boolean,
-    error : ?Error,
+    error : null | Error,
 };
 
-// A unique key that can be used to get the status of some item
-// export default Symbol('status');
-export default '__status__'; // XXX workaround for nonunique symbol import issue (duplicate packages)
+// A unique key that can be used to get the status of some item.
+// Note: must be a separate `const`, rather than exporting it directly, otherwise TS considers the type just
+// `symbol` rather than `unique symbol`.
+export const statusKey = Symbol('lifecycle.status');
+
+export default statusKey;

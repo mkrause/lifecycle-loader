@@ -3,6 +3,7 @@
 import $msg from 'message-tag';
 
 import statusKey, { type Status } from '../interfaces/status.js';
+import { itemKey as originalKey } from '../interfaces/loadable.js';
 import { type Loadable } from '../interfaces/Loadable.js';
 
 
@@ -20,8 +21,6 @@ Example:
     const userLoaded = userLoading[status].asReady({ name: 'John' });
     userLoaded[status]; // ready = true, loading = false, error = null
 */
-
-const originalKey = Symbol('original');
 
 const statusMethods = {
     withStatus(status : Status) {
@@ -96,8 +95,8 @@ const handlerMethods = {
         
         if (typeof targetProp === 'function') {
             // Some methods of built-in types cannot be proxied, i.e. they need to bound directly to the
-            // target. Because they explicitly check the type of `this` (e.g. Date), or because they need
-            // to access an original slot of the target (e.g. String.toString).
+            // target. Because they explicitly check the type of `this` (e.g. `Date`), or because they need
+            // to access an original slot of the target (e.g. `String.toString`).
             // https://stackoverflow.com/questions/36394479
             // https://stackoverflow.com/questions/47874488/proxy-on-a-date-object
             const cannotProxy =
