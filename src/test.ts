@@ -5,11 +5,12 @@ import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/
 import LoadableSimple from './loadable/LoadableSimple.js';
 
 
+// npm run build:cjs && node lib-cjs/test.js
+
 /*
 TODO:
   - Allow param `T` to be optional if the status is not known to be ready
   - fix StatusMethods implementation
-  - refactor LoadableProxy
 */
 
 type User = { readonly name : string };

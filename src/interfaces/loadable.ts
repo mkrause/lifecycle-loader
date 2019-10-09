@@ -8,7 +8,7 @@ Loadable: any object that specifies a `status`.
 
 export const itemKey = Symbol('lifecycle.item');
 
-type StatusMethods<T> = {
+export type StatusMethods<T> = {
     asReady : (item : T) => Loadable<T>,
     asFailed : (reason : Error) => Loadable<T>,
     asLoading : () => Loadable<T>,

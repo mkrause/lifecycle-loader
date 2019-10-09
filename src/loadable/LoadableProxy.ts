@@ -2,33 +2,40 @@
 import $msg from 'message-tag';
 
 import { statusKey, Status } from '../interfaces/status.js';
-import { itemKey, Loadable } from '../interfaces/loadable.js';
+import { itemKey, Loadable, StatusMethods } from '../interfaces/loadable.js';
 
 import ProxyWrapper, { isProxyKey } from '../util/ProxyWrapper.js';
 
 
+const statusMethods = {
+    asReady<T>(item : T) : Loadable<T> {
+        // TODO
+        return undefined as any;
+    },
+    asFailed<T>(reason : Error) : Loadable<T> {
+        // TODO
+        return undefined as any;
+    },
+    asLoading<T>() : Loadable<T> {
+        // TODO
+        return undefined as any;
+    },
+};
+
 const defaultStatus : Status = { ready: false, loading: false, error: null };
 
-const LoadableProxy = (value : unknown, status : Status = defaultStatus) => {
+const LoadableProxy = <T>(item : T, status : Status = defaultStatus) : Loadable<T> => {
     // Prevent proxying multiple times (to prevent bugs where an object is repeatedly proxied over and over)
-    if (typeof value === 'object' && value !== null && isProxyKey in value) {
+    if (typeof item === 'object' && item !== null && isProxyKey in item) {
         // TODO: maybe just unwrap the given proxy and override the status?
-        throw new TypeError($msg`Cannot create a LoadableProxy from a value which is already a LoadableProxy`);
+        throw new TypeError($msg`Cannot create a LoadableProxy from an item which is already a LoadableProxy`);
     }
     
-    /*
     // Note: use `statusMethods` as prototype, rather than adding it directly to the status object,
     // so that the methods are not copied when enumerating (e.g. by object spread).
-    const status : Status = Object.assign(Object.create(statusMethods), { ready, loading, error });
+    const statusWithMethods : Status & StatusMethods<T> = Object.assign(Object.create(statusMethods), status);
     
-    // Remember the original value
-    Object.defineProperty(status, itemKey, {
-        value,
-        enumerable: false,
-    });
-    */
-    
-    return ProxyWrapper(value, { [statusKey]: status });
+    return ProxyWrapper(item, { [statusKey]: statusWithMethods, [itemKey]: item });
 };
 
 /*
