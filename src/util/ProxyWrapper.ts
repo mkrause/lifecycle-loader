@@ -18,6 +18,14 @@ export const isProxyKey = Symbol('isProxy');
 const handlerMethods = {
     // Note in the following that `this` will always be set to the handler object (by Proxy internally).
     
+    getPrototypeOf<B, E extends Extension>({ body, extension } : { body : B, extension : E }) {
+        if (typeof body === 'object' && body !== null) {
+            return Object.getPrototypeOf(body);
+        } else {
+            return null;
+        }
+    },
+    
     ownKeys<B, E extends Extension>({ body, extension } : { body : B, extension : E }) {
         // Note: `ownKeys` should include non-enumerable keys. Should also include symbol keys.
         
@@ -123,6 +131,7 @@ const handlerMethods = {
         }
     },
     
+    setPrototypeOf() { return false; },
     isExtensible() { return false; },
     //preventExtensions() {}, // Leave as default
     set() { throw new TypeError($msg`Unable to modify object`); },
@@ -147,8 +156,7 @@ const ProxyWrapper = <V, E extends Extension>(value : V, extension : E) => {
     if (body === undefined) {
         throw new TypeError($msg`Cannot construct proxy, given \`undefined\``);
     } else if (body === null) {
-        // Interpret null values as "empty", simulate by using an empty object
-        body = {};
+        body = null;
     } else if (typeof value === 'string') {
         body = new String(value);
     } else if (typeof value === 'number') {

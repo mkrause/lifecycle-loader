@@ -25,6 +25,9 @@ describe('ProxyWrapper', () => {
     
     it('should simulate string as boxed String', () => {
         const proxy = ProxyWrapper('foo', { ext: 42 });
+        
+        expect(proxy).to.be.an.instanceOf(String);
+        
         expect(String(proxy)).to.equal('foo');
         expect(proxy.valueOf()).to.equal('foo');
         
@@ -36,6 +39,9 @@ describe('ProxyWrapper', () => {
     
     it('should simulate number as boxed Number', () => {
         const proxy = ProxyWrapper(42, { ext: 42 });
+        
+        expect(proxy).to.be.an.instanceOf(Number);
+        
         expect(Number(proxy)).to.equal(42);
         expect(proxy.valueOf()).to.equal(42);
         
