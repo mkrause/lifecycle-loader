@@ -47,14 +47,12 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
     // a new LoadablePromise (which fails due to lack of information given to the constructor).
     static [Symbol.species] = Promise;
     
-    /*
     // Create from existing promise
-    static from<T>(item : Loadable, promise : Promise<T>) : LoadablePromise {
+    static from<T>(item : Loadable<T>, promise : Promise<Loadable<T>>) : LoadablePromise<T> {
         return new LoadablePromise((resolve, reject) => {
             promise.then(resolve, reject);
         }, item);
     }
-    */
     
     private fulfilled : boolean = false;
     public readonly item : Loadable<T>;
@@ -64,6 +62,8 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
         item : Loadable<T>
     ) {
         super((resolve : Resolver<Loadable<T>>, reject : Rejecter) => {
+            // Note: need to do this check here, because we cannot do it before `super()`, but we also want
+            // it before the call to `executor()`.
             if (!item[statusKey].loading) {
                 throw new TypeError($msg`Expected item with status loading, given ${item[statusKey]}`);
             }

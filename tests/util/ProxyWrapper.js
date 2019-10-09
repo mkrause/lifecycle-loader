@@ -61,6 +61,15 @@ describe('ProxyWrapper', () => {
         expect(proxy.ext).to.equal(42);
     });
     
+    it('should allow symbols as extension keys', () => {
+        const sym = Symbol('sym');
+        
+        const proxy = ProxyWrapper(null, { [sym]: 'internal' });
+        
+        expect(proxy).to.have.property(sym, 'internal');
+        expect(proxy[sym]).to.equal('internal');
+    });
+    
     it('should allow getting property descriptors', () => {
         const body = { name: 'John' };
         const proxy = ProxyWrapper(body, { ext: 42 });
