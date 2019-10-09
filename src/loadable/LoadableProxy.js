@@ -184,4 +184,56 @@ const LoadableProxy = (value : mixed, { ready = false, loading = false, error = 
     });
 };
 
+LoadableProxy.fromPromise = async (promise, subscriber = () => {}) => {
+    subscriber(LoadableProxy(null, { loading: true }));
+    
+    try {
+        const result = await promise;
+        
+        let loadable;
+        if (statusKey in result) {
+            loadable = result;
+        } else {
+            loadable = LoadableProxy(result, { ready: true });
+        }
+        
+        subscriber(loadable);
+        return loadable;
+    } catch (reason) {
+        const loadable = LoadableProxy(null, { error: reason });
+        
+        subscriber(loadable);
+        return loadable;
+    }
+};
+
+LoadableProxy.fromPromiseWithCache = async (item, promise, subscriber = () => {}) => {
+    // We can only work with items that have been constructed using `LoadablyProxy`, otherwise
+    // we don't have a standard way to access the underlying item.
+    if (!(originalKey in item)) {
+        throw new TypeError($msg`Expected LoadableProxy, given ${item}`);
+    }
+    
+    subscriber(LoadableProxy(null, { loading: true }));
+    
+    try {
+        const result = await promise;
+        
+        let loadable;
+        if (statusKey in result) {
+            loadable = result;
+        } else {
+            loadable = LoadableProxy(result, { ready: true });
+        }
+        
+        subscriber(loadable);
+        return loadable;
+    } catch (reason) {
+        const loadable = LoadableProxy(null, { error: reason });
+        
+        subscriber(loadable);
+        return loadable;
+    }
+};
+
 export default LoadableProxy;
