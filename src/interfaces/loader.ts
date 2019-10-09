@@ -60,7 +60,7 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
     public readonly item : Loadable<T>;
     
     constructor(
-        executor : (resolve : (item : Loadable<T>) => void, reject : (reason : Error) => void) => void,
+        executor : (resolve : (item : Loadable<T>) => void, reject : (item : Loadable<T>) => void) => void,
         item : Loadable<T>
     ) {
         super((resolve : Resolver<Loadable<T>>, reject : Rejecter) => {
@@ -77,13 +77,13 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
                     this.fulfilled = true;
                     resolve(item);
                 },
-                (reason : Error) => {
+                (item : Loadable<T>) => {
                     if (!item[statusKey].error) {
                         throw new TypeError($msg`Expected item with status failed, given ${item[statusKey]}`);
                     }
                     
                     this.fulfilled = true;
-                    reject(new LoadError(reason, item));
+                    reject(new LoadError(item[statusKey].error, item));
                 },
             );
         });
@@ -105,7 +105,7 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
         
         this.then(
             (itemReady : Loadable<T>) => { subscriber(itemReady); },
-            (reason : Error) => { subscriber(this.item[statusKey].asFailed(reason)); },
+            (reason : LoadError<T>) => { subscriber(reason.item); },
         );
         
         return this;

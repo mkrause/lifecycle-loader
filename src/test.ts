@@ -7,6 +7,14 @@ import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/
 type User = { readonly name : string };
 type UserOptional = { readonly name ?: string };
 
+// type StatusMethods<T> = {
+//     asReady : (item : T) => Loadable<T>,
+//     asFailed : (reason : Error) => Loadable<T>,
+//     asLoading : () => Loadable<T>,
+// };
+
+// type LoadableWithUpdates<T> = Loadable<T> & { [statusKey] : Status & StatusMethods<T> };
+
 const LoadableSimple = <T>(item : T) : Loadable<T> => ({
     [itemKey]: item,
     [statusKey]: {
@@ -53,6 +61,16 @@ const loadUser : LoadablePromise<UserOptional> = new LoadablePromise(
     userInitial,
 );
 
+const loadUserFail : LoadablePromise<UserOptional> = new LoadablePromise(
+    (resolve, reject) => {
+        setTimeout(() => {
+            const userFailed : Loadable<UserOptional> = userInitial[statusKey].asFailed(new Error('failed'));
+            reject(userFailed);
+        }, 1000);
+    },
+    userInitial,
+);
+
 (async () => {
     loadUser.subscribe(user => {
         console.log('subscriber:', user);
@@ -62,4 +80,18 @@ const loadUser : LoadablePromise<UserOptional> = new LoadablePromise(
     const user : Loadable<UserOptional> = await loadUser;
     
     console.log('result', user[itemKey]);
+    
+    
+    
+    console.info('Testing failed...');
+    loadUserFail.subscribe(user => {
+        console.log('subscriber:', user);
+    });
+    
+    console.info('Loading...');
+    try {
+        await loadUserFail;
+    } catch (reason) {
+        console.log('error:', reason);
+    }
 })();
