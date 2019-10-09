@@ -1,8 +1,8 @@
 
 import $msg from 'message-tag';
 
-import { Status, statusKey } from './status.js';
-import { Loadable, itemKey } from './loadable.js';
+import { Status, statusKey } from './Status.js';
+import { Loadable, itemKey } from './Loadable.js';
 
 
 // A *loader* is a function that takes an item (the current state), and returns a promise for

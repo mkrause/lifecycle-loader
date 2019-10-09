@@ -1,7 +1,6 @@
 
-import status from '../interfaces/status.js';
-
-import { LoadablePromise } from '../interfaces/loader.js';
+import status from '../interfaces/Status.js';
+import { LoadablePromise } from '../interfaces/Loader.js';
 
 
 // Create a loader for an item from local storage (stored under the given key).

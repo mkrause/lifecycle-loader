@@ -1,8 +1,8 @@
 
 import $msg from 'message-tag';
 
-import { statusKey, Status } from '../interfaces/status.js';
-import { itemKey, Loadable, StatusMethods } from '../interfaces/loadable.js';
+import { statusKey, Status } from '../interfaces/Status.js';
+import { itemKey, Loadable, StatusMethods } from '../interfaces/Loadable.js';
 
 import ProxyWrapper, { isProxyKey } from '../util/ProxyWrapper.js';
 

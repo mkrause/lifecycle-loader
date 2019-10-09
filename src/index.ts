@@ -1,7 +1,7 @@
 
-import { statusKey, Status } from './interfaces/status.js';
-import { itemKey, Loadable } from './interfaces/loadable.js';
-import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/loader.js';
+import { statusKey, Status } from './interfaces/Status.js';
+import { itemKey, Loadable } from './interfaces/Loadable.js';
+import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/Loader.js';
 
 // Loadable implementations
 import LoadableProxy from './loadable/LoadableProxy.js';

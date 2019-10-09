@@ -1,8 +1,8 @@
 
 import chai, { assert, expect } from 'chai';
 
-import statusKey from '../../lib-esm/interfaces/status.js';
-import loadableFromStatus from '../../lib-esm/loadable/fromStatus.js';
+import statusKey from '../../lib-esm/interfaces/Status.js';
+import LoadableSimple from '../../lib-esm/loadable/LoadableSimple.js';
 
 
 describe('LoadableSimple', () => {

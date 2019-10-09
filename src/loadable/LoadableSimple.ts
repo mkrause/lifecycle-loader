@@ -1,6 +1,6 @@
 
-import { statusKey, Status } from '../interfaces/status.js';
-import { itemKey, Loadable } from '../interfaces/loadable.js';
+import { statusKey, Status } from '../interfaces/Status.js';
+import { itemKey, Loadable } from '../interfaces/Loadable.js';
 
 
 // type StatusMethods<T> = {

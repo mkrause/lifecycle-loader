@@ -1,7 +1,7 @@
 
 import chai, { assert, expect } from 'chai';
 
-import status from '../../lib-esm/interfaces/status.js';
+import status from '../../lib-esm/interfaces/Status.js';
 import Loadable from '../../lib-esm/loadable/LoadableProxy.js';
 import asyncLoader from '../../lib-esm/loaders/async_loader.js';
 

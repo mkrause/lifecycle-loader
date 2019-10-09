@@ -1,5 +1,5 @@
 
-import { statusKey, Status } from './status.js';
+import { statusKey, Status } from './Status.js';
 
 
 /*
