@@ -1,7 +1,7 @@
 
 import chai, { assert, expect } from 'chai';
 
-import statusKey from '../../lib-esm/interfaces/status.js';
+import { statusKey } from '../../lib-esm/interfaces/status.js';
 
 
 describe('status', () => {

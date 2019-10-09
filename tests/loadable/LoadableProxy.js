@@ -1,8 +1,8 @@
 
 import chai, { assert, expect } from 'chai';
 
-import status from '../../lib-esm/interfaces/status.js';
-import Loadable from '../../lib-esm/loadable/LoadableProxy.js';
+import { statusKey } from '../../lib-esm/interfaces/status.js';
+import LoadableProxy from '../../lib-esm/loadable/LoadableProxy.js';
 
 
 describe('LoadableProxy', () => {
@@ -11,65 +11,67 @@ describe('LoadableProxy', () => {
         // because chai's `keys` assertion only works for enumerable properties. Use `status in obj` instead.
         
         it('should not be constructable from undefined', () => {
-            expect(() => { Loadable(); }).to.throw(TypeError);
-            expect(() => { Loadable(undefined); }).to.throw(TypeError);
+            expect(() => { LoadableProxy(); }).to.throw(TypeError);
+            expect(() => { LoadableProxy(undefined); }).to.throw(TypeError);
         });
         
-        it('should construct a Loadable without any properties from null', () => {
-            expect(Loadable(null)).to.satisfy(subject => status in subject);
-            expect(Loadable(42)[status]).to.have.property('ready', false);
+        it('should construct a LoadableProxy without any properties from null', () => {
+            expect(LoadableProxy(null)).to.satisfy(subject => statusKey in subject);
+            expect(LoadableProxy(42)[statusKey]).to.have.property('ready', false);
         });
         
         it('should not be constructable from a boolean', () => {
             // Booleans cannot be represented as objects (while still maintaining their semantics)
-            expect(() => { Loadable(true); }).to.throw(TypeError);
-            expect(() => { Loadable(false); }).to.throw(TypeError);
+            expect(() => { LoadableProxy(true); }).to.throw(TypeError);
+            expect(() => { LoadableProxy(false); }).to.throw(TypeError);
         });
         
-        it('should construct a Loadable from a primitive string', () => {
-            expect(Loadable('foo')).to.satisfy(subject => status in subject);
+        it('should construct a LoadableProxy from a primitive string', () => {
+            expect(LoadableProxy('foo')).to.satisfy(subject => statusKey in subject);
             
-            expect(Loadable('foo').toString()).to.equal('foo');
-            expect(String(Loadable('foo'))).to.equal('foo');
+            expect(LoadableProxy('foo').toString()).to.equal('foo');
+            expect(String(LoadableProxy('foo'))).to.equal('foo');
         });
         
-        it('should construct a Loadable from a primitive number', () => {
-            expect(Loadable(42)).to.satisfy(subject => status in subject);
+        it('should construct a LoadableProxy from a primitive number', () => {
+            expect(LoadableProxy(42)).to.satisfy(subject => statusKey in subject);
             
-            expect(Loadable(42).valueOf()).to.equal(42);
-            expect(Number(Loadable(42))).to.equal(42);
+            expect(LoadableProxy(42).valueOf()).to.equal(42);
+            expect(Number(LoadableProxy(42))).to.equal(42);
         });
         
-        it('should construct a Loadable from a plain object', () => {
-            expect(Loadable({ x: 42 })).to.satisfy(subject => status in subject);
+        it('should construct a LoadableProxy from a plain object', () => {
+            expect(LoadableProxy({ x: 42 })).to.satisfy(subject => statusKey in subject);
             
-            expect(Loadable({ x: 42 })).to.have.property('x', 42);
+            expect(LoadableProxy({ x: 42 })).to.have.property('x', 42);
         });
         
-        it('should construct a Loadable from a Date instance', () => {
-            expect(Loadable(new Date('2018-01-01T03:24:00'))).to.satisfy(subject => status in subject);
+        it('should construct a LoadableProxy from a Date instance', () => {
+            expect(LoadableProxy(new Date('2018-01-01T03:24:00'))).to.satisfy(subject => statusKey in subject);
             
-            expect(Loadable(new Date('2018-01-01T03:24:00')).getFullYear()).to.equal(2018);
+            expect(LoadableProxy(new Date('2018-01-01T03:24:00')).getFullYear()).to.equal(2018);
         });
     });
     
+    /*
     describe('status methods', () => {
         it('should support update()', () => {
-            const subject = Loadable({ x: 42 });
+            const subject = LoadableProxy({ x: 42 });
             
-            const subjectUpdated = subject[status].update({ ready: true });
+            const subjectUpdated = subject[statusKey].update({ ready: true });
             
             expect(subjectUpdated).to.deep.equal(subject); // Should not be changed
-            expect(subjectUpdated[status]).to.have.property('ready', true);
+            expect(subjectUpdated[statusKey]).to.have.property('ready', true);
         });
         
         it('should support asReady()', () => {
-            const subject = Loadable({ x: null });
+            const subject = LoadableProxy({ x: null });
             
-            const subjectReady = subject[status].asReady({ x: 42 });
+            const subjectReady = subject[statusKey].asReady({ x: 42 });
             
             expect(subjectReady).to.deep.equal({ x: 42 });
-            expect(subjectReady[status]).to.have.property('ready', true);
+            expect(subjectReady[statusKey]).to.have.property('ready', true);
         });
     });
+    */
 });

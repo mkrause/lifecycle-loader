@@ -7,6 +7,7 @@ import asyncLoader from '../../lib-esm/loaders/async_loader.js';
 
 
 describe('asyncLoader', () => {
+    /*
     it('should be subscribable', done => {
         const load = asyncLoader(42);
         const itemInitial = Loadable(0);
@@ -47,4 +48,5 @@ describe('asyncLoader', () => {
         expect(itemReady[status]).to.have.property('loading', false);
         expect(itemReady[status]).to.have.property('error', null);
     });
+    */
 });

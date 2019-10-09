@@ -5,8 +5,9 @@ import statusKey from '../../lib-esm/interfaces/status.js';
 import loadableFromStatus from '../../lib-esm/loadable/fromStatus.js';
 
 
-describe('fromStatus', () => {
-    it('should create an object with item and its status', () => {
+describe('LoadableSimple', () => {
+    it('should ... [TODO]', () => {
+        /*
         const item = 42;
         
         const status = {
@@ -17,5 +18,6 @@ describe('fromStatus', () => {
         
         expect(loadableFromStatus(status, item)).to.have.property(statusKey, status);
         expect(loadableFromStatus(status, item)).to.have.property('item', item);
+        */
     });
 });

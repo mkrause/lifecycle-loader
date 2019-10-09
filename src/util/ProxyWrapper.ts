@@ -7,48 +7,73 @@ Similar:
   - https://www.npmjs.com/package/proxy-helpers
 */
 
-const hasOwnProperty = (obj, propName) => Object.prototype.hasOwnProperty.call(obj, propName);
+// TODO: provide some utilities to customize debug formatting (`inspect` for Node, and a custom DevTools formatter).
 
-type Extension = { [key in keyof any] : unknown };
-const isProxyKey = Symbol();
+const hasOwnProperty = (obj : object, propName : PropertyKey) =>
+    Object.prototype.hasOwnProperty.call(obj, propName);
+
+type Extension = { [key in PropertyKey] : unknown };
+export const isProxyKey = Symbol('isProxy');
 
 const handlerMethods = {
-    // Note: within all of the following, we can assume that `target` is a non-primitive object,
-    // guaranteed by the fact that in JS a Proxy target must be a non-primitive object.
+    // Note in the following that `this` will always be set to the handler object (by Proxy internally).
     
-    ownKeys(target) {
-        // Note: `ownKeys` should include non-enumerable keys
-        return [...Reflect.ownKeys(extension), ...Reflect.ownKeys(target)];
+    ownKeys<B, E extends Extension>({ body, extension } : { body : B, extension : E }) {
+        // Note: `ownKeys` should include non-enumerable keys. Should also include symbol keys.
+        
+        // const extensionKeys = typeof extension === 'object' && extension !== null
+        //     ? Reflect.ownKeys(extension as any)
+        //     : [];
+        
+        const bodyKeys = typeof body === 'object' && body !== null
+            ? Reflect.ownKeys(body as any)
+            : [];
+        
+        // return [...extensionKeys, ...bodyKeys];
+        return bodyKeys;
     },
-    has(target, name) {
-        if (hasOwnProperty(extension, name)) {
-            return true;
-        }
+    
+    has<B, E extends Extension>({ body, extension } : { body : B, extension : E }, propName : PropertyKey) {
+        if (hasOwnProperty(extension, propName)) { return true; }
+        if (typeof body === 'object' && body !== null && propName in body) { return true; }
         
         // Implement `toJSON` for boxed primitives
-        if (name === 'toJSON') {
-            if (target instanceof String || target instanceof Number) {
+        if (propName === 'toJSON') {
+            if (body instanceof String || body instanceof Number) {
                 return true;
             }
         }
         
-        return name in target;
+        // Backdoor, to allow checking whether this is a proxy
+        if (propName === isProxyKey) {
+            return true;
+        }
+        
+        return false;
     },
-    get(target, name, receiver) {
-        // Implement `toJSON` for boxed primitives
-        if (name === 'toJSON') {
-            if (target instanceof String) {
-                return target.toString.bind(target);
-            } else if (target instanceof Number) {
-                return target.valueOf.bind(target);
+    
+    get<B, E extends Extension>(
+        { body, extension } : { body : B, extension : E },
+        propName : PropertyKey,
+        receiver : unknown
+    ) {
+        let targetProp = undefined;
+        if (hasOwnProperty(extension, propName)) {
+            targetProp = (extension as any)[propName]; // Cast to any (guaranteed by conditional)
+        } else if (typeof body === 'object' && body !== null && propName in body) {
+            targetProp = (body as any)[propName]; // Cast to any (guaranteed by conditional)
+        } else {
+            // Fallback: property is not present in either the body or extension
+            
+            // Implement `toJSON` for boxed primitives (as a convenience)
+            if (propName === 'toJSON') {
+                if (body instanceof String) {
+                    targetProp = body.toString.bind(body);
+                } else if (body instanceof Number) {
+                    targetProp = body.valueOf.bind(body);
+                }
             }
         }
-        
-        if (!(name in target)) {
-            return undefined;
-        }
-        
-        const targetProp = target[name];
         
         if (typeof targetProp === 'function') {
             // Some methods of built-in types cannot be proxied, i.e. they need to bound directly to the
@@ -57,14 +82,14 @@ const handlerMethods = {
             // https://stackoverflow.com/questions/36394479
             // https://stackoverflow.com/questions/47874488/proxy-on-a-date-object
             const cannotProxy =
-                target instanceof String
-                || target instanceof Number
-                || target instanceof Date
-                || target instanceof RegExp;
+                body instanceof String
+                || body instanceof Number
+                || body instanceof Date
+                || body instanceof RegExp;
             
             if (cannotProxy) {
                 // Have `this` bound to the original target
-                return targetProp.bind(target);
+                return targetProp.bind(body);
             } else {
                 // Unbound (i.e. `this` will be bound to the proxy object, or possibly some other receiver)
                 return targetProp;
@@ -73,75 +98,79 @@ const handlerMethods = {
             return targetProp;
         }
     },
-    getOwnPropertyDescriptor(target, name) {
-        return Object.getOwnPropertyDescriptor(target, name);
+    
+    getOwnPropertyDescriptor<B, E extends Extension>(
+        { body, extension } : { body : B, extension : E },
+        propName : PropertyKey
+    ) {
+        if (hasOwnProperty(extension, propName)) {
+            return {
+                value: (extension as any)[propName],
+                
+                // Make the extension prop non-enumerable, so it does not get copied (e.g. on `{ ...obj }` spread)
+                enumerable: false,
+                
+                // *Must* be configurable (enforced by Proxy), see:
+                // https://stackoverflow.com/questions/40921884
+                configurable: true,
+            };
+        } else {
+            if (typeof body === 'object' && body !== null) {
+                return Object.getOwnPropertyDescriptor(body, propName);
+            } else {
+                return undefined;
+            }
+        }
     },
+    
+    isExtensible() { return false; },
+    //preventExtensions() {}, // Leave as default
+    set() { throw new TypeError($msg`Unable to modify object`); },
+    defineProperty() { throw new TypeError($msg`Unable to modify object`); },
+    deleteProperty() { throw new TypeError($msg`Unable to modify object`); },
 };
 
+type Proxied<V, E> = E & (
+    V extends undefined ? never
+        : V extends null ? {}
+        : V extends number ? Number
+        : V extends boolean ? never
+        : V extends symbol ? never
+        : V
+);
+
 const ProxyWrapper = <V, E extends Extension>(value : V, extension : E) => {
-    if (typeof value === 'object' && value !== null && value[isProxyKey] === true) {
-        return value; // Already proxied
-    }
+    let body : unknown = value;
     
-    // The target object. Note that Proxy only accepts an object (non-null), i.e. no primitive
-    // types (undefined, null, string, number, boolean, symbol).
-    let target = value;
-    
-    // Handle some primitives (values that cannot be proxied)
-    if (typeof target === 'undefined') {
-        throw new TypeError($msg`Cannot construct Proxy, given \`undefined\``);
-    } else if (target === null) {
+    // Handle primitive values. Because a Proxy always behaves as an object, we cannot really transparently
+    // "simulate" a primitive. However, we use sensible equivalents where possible.
+    if (body === undefined) {
+        throw new TypeError($msg`Cannot construct proxy, given \`undefined\``);
+    } else if (body === null) {
         // Interpret null values as "empty", simulate by using an empty object
-        target = {};
+        body = {};
     } else if (typeof value === 'string') {
-        target = new String(value);
+        body = new String(value);
     } else if (typeof value === 'number') {
-        target = new Number(value);
+        body = new Number(value);
     } else if (typeof value === 'boolean') {
-        throw new TypeError($msg`Cannot construct Proxy from boolean, given ${value}`);
+        // Note: we could use a boxed `Boolean`, but it would not be very useful because there's not much you can
+        // do with it. For example, `!new Boolean(false)` is `false`, not `true`.
+        throw new TypeError($msg`Cannot construct proxy from boolean, given ${value}`);
     } else if (typeof value === 'symbol') {
-        throw new TypeError($msg`Cannot construct Proxy from symbol, given ${value}`);
+        throw new TypeError($msg`Cannot construct proxy from symbol, given ${value}`);
     } else if (typeof value !== 'object') {
-        // Note: this should never happen, unless JS adds a new type of primitive
-        throw new TypeError($msg`Cannot construct Proxy, given value of unknown type: ${value}`);
+        throw new TypeError($msg`Cannot construct proxy, given value of unknown type: ${value}`);
     }
     
-    // Note: use `statusMethods` as prototype, rather than adding it directly to the status object,
-    // so that the methods are not copied when enumerating (e.g. by object spread).
-    // const status : Status = Object.assign(Object.create(statusMethods), { ready, loading, error });
+    // Note: for `Proxy`, the following rule holds:
+    // Any non-configurable property of the actual target must occur in the list of properties returned by `ownKeys`.
+    // Thus, we want to prevent non-configurable properties existing on our target. That means that the target
+    // cannot (for example) be an array, because then we would be required to implement properties like `length`.
+    // https://stackoverflow.com/questions/39811021/typeerror-ownkeys-on-proxy-trap
     
-    // Remember the original value
-    // Object.defineProperty(status, itemKey, {
-    //     value,
-    //     enumerable: false,
-    // });
-    
-    // Note: some proxy methods (the ones that reference `status`) have to be created inline for each proxy,
-    // because we rely on a closure to store the `status` of each proxy.
-    return new Proxy(target, {
-        ...handlerMethods,
-        get(target, name, receiver) {
-            if (hasOwnProperty(extension, name)) {
-                return extension[name];
-            }
-            
-            return handlerMethods.get(target, name, receiver);
-        },
-        getOwnPropertyDescriptor(target, name) {
-            if (hasOwnProperty(extension, name)) {
-                return {
-                    value: extension[name],
-                    
-                    // Make the status non-enumerable, so it does not get copied (e.g. on `{ ...obj }` spread)
-                    enumerable: false,
-                    
-                    // *Must* be configurable, see:
-                    // https://stackoverflow.com/questions/40921884
-                    configurable: true,
-                };
-            }
-        },
-    });
+    // Cast to `Proxied<V, E>`, to assert that the proxy behaves like `V`, but extended with `E`
+    return new Proxy({ body, extension }, handlerMethods) as any as Proxied<V, E>;
 };
 
 export default ProxyWrapper;
