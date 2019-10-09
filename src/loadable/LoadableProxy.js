@@ -4,7 +4,7 @@ import $msg from 'message-tag';
 
 import statusKey, { type Status } from '../interfaces/status.js';
 import { itemKey as originalKey } from '../interfaces/loadable.js';
-import { type Loadable } from '../interfaces/Loadable.js';
+import { type Loadable } from '../interfaces/loadable.js';
 
 
 /*
