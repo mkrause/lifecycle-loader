@@ -18,6 +18,8 @@ describe('ProxyWrapper', () => {
     it('should simulate null as empty object', () => {
         const proxy = ProxyWrapper(null, { ext: 42 });
         
+        expect(Object.getPrototypeOf(proxy)).to.equal(null);
+        
         expect(proxy).to.not.equal(null); // Cannot trap equality
         expect(Reflect.ownKeys(proxy)).to.deep.equal([]); // Should be empty
         expect(Object.keys(proxy)).to.deep.equal([]); // Should be empty
