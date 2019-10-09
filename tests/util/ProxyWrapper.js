@@ -18,6 +18,7 @@ describe('ProxyWrapper', () => {
     it('should simulate null as empty object', () => {
         const proxy = ProxyWrapper(null, { ext: 42 });
         
+        expect(typeof proxy).to.equal('object');
         expect(Object.getPrototypeOf(proxy)).to.equal(null);
         
         expect(proxy).to.not.equal(null); // Cannot trap equality
@@ -28,6 +29,7 @@ describe('ProxyWrapper', () => {
     it('should simulate string as boxed String', () => {
         const proxy = ProxyWrapper('foo', { ext: 42 });
         
+        expect(typeof proxy).to.equal('object');
         expect(proxy).to.be.an.instanceOf(String);
         
         expect(String(proxy)).to.equal('foo');
@@ -42,6 +44,7 @@ describe('ProxyWrapper', () => {
     it('should simulate number as boxed Number', () => {
         const proxy = ProxyWrapper(42, { ext: 42 });
         
+        expect(typeof proxy).to.equal('object');
         expect(proxy).to.be.an.instanceOf(Number);
         
         expect(Number(proxy)).to.equal(42);
