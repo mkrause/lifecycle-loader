@@ -56,30 +56,17 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
     }
     */
     
-    readonly item : Loadable<T>;
+    private fulfilled : boolean = false;
+    public readonly item : Loadable<T>;
     
     constructor(
         executor : (resolve : (item : Loadable<T>) => void, reject : (reason : Error) => void) => void,
         item : Loadable<T>
     ) {
         super((resolve : Resolver<Loadable<T>>, reject : Rejecter) => {
-            // const resolveLoadable = (value ?: T | PromiseLike<T>) => {
-            //     if (typeof value === 'undefined') {
-            //         const reason = $msg`Expected item, given \`undefined\``;
-            //         reject(new LoadError(reason, item[statusKey].asFailed(new Error(reason))));
-            //     } else if (typeof value === 'object' && value !== null && 'then' in value) { // Check if `PromiseLike`
-            //         value.then(resolveLoadable, rejectLoadable);
-            //     } else {
-            //         resolve(item[statusKey].asReady(value));
-            //     }
-            // };
-            
-            // const rejectLoadable = (reason : Error) => {
-            //     reject(new LoadError(reason, item[statusKey].asFailed(reason)));
-            // };
-            
-            // executor(resolveLoadable, rejectLoadable);
-            
+            if (!item[statusKey].loading) {
+                throw new TypeError($msg`Expected item with status loading, given ${item[statusKey]}`);
+            }
             
             executor(
                 (item : Loadable<T>) => {
@@ -87,6 +74,7 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
                         throw new TypeError($msg`Expected item with status ready, given ${item[statusKey]}`);
                     }
                     
+                    this.fulfilled = true;
                     resolve(item);
                 },
                 (reason : Error) => {
@@ -94,6 +82,7 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
                         throw new TypeError($msg`Expected item with status failed, given ${item[statusKey]}`);
                     }
                     
+                    this.fulfilled = true;
                     reject(new LoadError(reason, item));
                 },
             );
@@ -102,36 +91,23 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
         this.item = item;
     }
     
-    /*
     // Similar to `then()`, but will be called:
-    // - Once, synchronously, with the item in loading state, *if* the item is not already
-    //   fulfilled synchronously.
-    // - Second, when the item is fulfilled (resolved or rejected), with the item in the
-    //   corresponding state (ready/failed).
-    // In addition, `subscribe` does not distinguish between resolved/reject, it only takes
+    // - Once, synchronously, with the item in loading state, *if* the item is not already fulfilled
+    //   (resolved or rejected) synchronously.
+    // - Second, when the item is fulfilled, with the item in the corresponding state (ready/failed).
+    // In addition, `subscribe` does not distinguish between resolved/rejected, it only takes
     // one function which is called regardless of the result (check the `status` instead).
-    subscribe(subscriber : (item : Loadable<T>) => void) : LoadablePromise<T> {
-        let fulfilled = false;
-        
-        const promise = this.then(
-            (itemReady : T) => {
-                fulfilled = true;
-                subscriber(itemReady);
-            },
-            itemFailed => {
-                fulfilled = true;
-                subscriber(itemFailed);
-            },
-        );
-        
-        // FIXME: likely doesn't work as expected. `fulfilled` should never be true here, because `.then()`
-        // is always scheduled async. Possible solution: run the `fulfill` function ourselves and extract the
-        // value synchronously.
-        if (!fulfilled) {
-            subscriber(this.item[statusKey].asLoading());
+    subscribe(this : LoadablePromise<T>, subscriber : (item : Loadable<T>) => void) : typeof this {
+        if (!this.fulfilled) {
+            // Note: should be guaranteed to be in loading state (by the check in the constructor)
+            subscriber(this.item);
         }
+        
+        this.then(
+            (itemReady : Loadable<T>) => { subscriber(itemReady); },
+            (reason : Error) => { subscriber(this.item[statusKey].asFailed(reason)); },
+        );
         
         return this;
     }
-    */
 }
