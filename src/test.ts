@@ -1,7 +1,7 @@
 
-import { statusKey, Status } from './interfaces/status.js';
-import { itemKey, Loadable } from './interfaces/loadable.js';
-import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/loader.js';
+import { statusKey, Status } from './interfaces/Status.js';
+import { itemKey, Loadable } from './interfaces/Loadable.js';
+import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/Loader.js';
 import LoadableSimple from './loadable/LoadableSimple.js';
 
 
@@ -9,8 +9,8 @@ import LoadableSimple from './loadable/LoadableSimple.js';
 
 /*
 TODO:
-  - Allow param `T` to be optional if the status is not known to be ready
-  - fix StatusMethods implementation
+  - Allow param `T` to be optional if the status is not known to be ready (i.e. the `UserOptional` problem below)
+  - fix StatusMethods implementation (some standardized way to update item value or status)
 */
 
 type User = { readonly name : string };
