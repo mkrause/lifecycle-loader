@@ -9,12 +9,10 @@ import LoadableSimple from './loadable/LoadableSimple.js';
 
 /*
 TODO:
-  - Allow param `T` to be optional if the status is not known to be ready (i.e. the `UserOptional` problem below)
   - fix StatusMethods implementation (some standardized way to update item value or status)
 */
 
 type User = { readonly name : string };
-type UserOptional = { readonly name ?: string };
 
 
 const userInitial : Loadable<User> = LoadableSimple<User>(null)[statusKey].asLoading();
