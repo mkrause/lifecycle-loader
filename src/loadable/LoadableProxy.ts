@@ -24,7 +24,7 @@ const statusMethods = {
 
 const defaultStatus : Status = { ready: false, loading: false, error: null };
 
-const LoadableProxy = <T>(item : T, status : Status = defaultStatus) : Loadable<T> => {
+const LoadableProxy = <T>(item : null | T, status : Status = defaultStatus) : Loadable<T> => {
     // Prevent proxying multiple times (to prevent bugs where an object is repeatedly proxied over and over)
     if (typeof item === 'object' && item !== null && isProxyKey in item) {
         // TODO: maybe just unwrap the given proxy and override the status?

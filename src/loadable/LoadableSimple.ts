@@ -11,7 +11,7 @@ import { itemKey, Loadable } from '../interfaces/Loadable.js';
 
 // type LoadableWithUpdates<T> = Loadable<T> & { [statusKey] : Status & StatusMethods<T> };
 
-const LoadableSimple = <T>(item : T) : Loadable<T> => ({
+const LoadableSimple = <T>(item : null | T) : Loadable<T> => ({
     [itemKey]: item,
     [statusKey]: {
         ready: false,

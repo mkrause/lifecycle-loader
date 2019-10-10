@@ -15,6 +15,8 @@ export type StatusMethods<T> = {
 };
 
 export type Loadable<T> = {
-    [itemKey] : T,
+    // May be `null` if not yet loaded
+    [itemKey] : null | T,
+    
     [statusKey] : Status & StatusMethods<T>,
 };

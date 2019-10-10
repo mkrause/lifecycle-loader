@@ -101,4 +101,16 @@ describe('ProxyWrapper', () => {
         
         expect({ ...proxy }).to.deep.equal({ name: 'John', score: 10 });
     });
+    
+    it('should work with classes', () => {
+        class User {
+            constructor(name) {
+                this.name = name;
+            }
+        }
+        
+        const proxy = ProxyWrapper(new User('John'), { ext: 42 });
+        
+        expect(proxy).to.be.an.instanceOf(User);
+    });
 });

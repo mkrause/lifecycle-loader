@@ -7,6 +7,14 @@ Similar:
   - https://www.npmjs.com/package/proxy-helpers
 */
 
+/*
+Transparently wraps any value, with the exception of:
+
+  - Equality will not work: `ProxyWrapper(42) !== 42`.
+  - `typeof` will return `object` for strings/numbers (these are "boxed"): `typeof ProxyWrapper(42) -== 'object'`.
+    (`instanceof` on the other hand will work fine.)
+*/
+
 // TODO: provide some utilities to customize debug formatting (`inspect` for Node, and a custom DevTools formatter).
 
 const hasOwnProperty = (obj : object, propName : PropertyKey) =>
@@ -148,7 +156,7 @@ type Proxied<V, E> = E & (
         : V
 );
 
-const ProxyWrapper = <V, E extends Extension>(value : V, extension : E) => {
+const ProxyWrapper = <V, E extends Extension>(value : V, extension : E = {} as E) => {
     let body : unknown = value;
     
     // Handle primitive values. Because a Proxy always behaves as an object, we cannot really transparently

@@ -17,22 +17,22 @@ type User = { readonly name : string };
 type UserOptional = { readonly name ?: string };
 
 
-const userInitial : Loadable<UserOptional> = LoadableSimple<UserOptional>({ name: undefined })[statusKey].asLoading();
+const userInitial : Loadable<User> = LoadableSimple<User>(null)[statusKey].asLoading();
 
-const loadUser : LoadablePromise<UserOptional> = new LoadablePromise(
+const loadUser : LoadablePromise<User> = new LoadablePromise(
     (resolve, reject) => {
         setTimeout(() => {
-            const userLoaded : Loadable<UserOptional> = userInitial[statusKey].asReady({ name: 'John' });
+            const userLoaded : Loadable<User> = userInitial[statusKey].asReady({ name: 'John' });
             resolve(userLoaded);
         }, 1000);
     },
     userInitial,
 );
 
-const loadUserFail : LoadablePromise<UserOptional> = new LoadablePromise(
+const loadUserFail : LoadablePromise<User> = new LoadablePromise(
     (resolve, reject) => {
         setTimeout(() => {
-            const userFailed : Loadable<UserOptional> = userInitial[statusKey].asFailed(new Error('failed'));
+            const userFailed : Loadable<User> = userInitial[statusKey].asFailed(new Error('failed'));
             reject(userFailed);
         }, 1000);
     },
@@ -45,7 +45,7 @@ const loadUserFail : LoadablePromise<UserOptional> = new LoadablePromise(
     });
     
     console.info('Loading...');
-    const user : Loadable<UserOptional> = await loadUser;
+    const user : Loadable<User> = await loadUser;
     
     console.log('result', user[itemKey]);
     
