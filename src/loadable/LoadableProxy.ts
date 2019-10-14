@@ -25,7 +25,7 @@ const statusMethods = {
 const defaultStatus : Status = { ready: false, loading: false, error: null };
 
 const LoadableProxy = <T>(item : null | T, status : Partial<Status> = {}) : Loadable<T> => {
-    const statusWithDefaults = Object.assign({}, defaultStatus, status);
+    const statusWithDefaults = { ...defaultStatus, ...status };
     
     // Prevent proxying multiple times (to prevent bugs where an object is repeatedly proxied over and over)
     if (typeof item === 'object' && item !== null && isProxyKey in item) {
