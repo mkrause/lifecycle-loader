@@ -17,9 +17,9 @@
     "scripts": {
         "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --extensions '.js,.ts' --source-maps inline",
         "build:esm": "NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --extensions '.js,.ts' --source-maps inline",
+        "types": "tsc --project ./tsconfig.decl.json --declarationDir ./lib-cjs && tsc --project ./tsconfig.decl.json --declarationDir ./lib-esm",
         "test": "npm run build:esm && NODE_ENV=development BABEL_ENV=cjs mocha --require=@babel/register --recursive tests",
-        "prepare": "npm run build:esm && npm run build:cjs",
-        "prepublishOnly": "npm run build:esm && npm run build:cjs"
+        "prepublishOnly": "npm run build:esm && npm run build:cjs && npm run types"
     },
     "devDependencies": {
         "@babel/core": "^7.6.3",
