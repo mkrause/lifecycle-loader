@@ -1,14 +1,14 @@
 
 import chai, { assert, expect } from 'chai';
 
-import ProxyWrapper, { isProxyKey } from '../../lib-esm/util/ProxyWrapper.js';
+import ProxyWrapper, { proxyKey } from '../../lib-esm/util/ProxyWrapper.js';
 
 
 describe('ProxyWrapper', () => {
     it('should return a proxy', () => {
         const proxy = ProxyWrapper(null, { ext: 42 });
         
-        expect(proxy).to.have.property(isProxyKey);
+        expect(proxy).to.have.property(proxyKey);
     });
     
     it('should not allow undefined', () => {
@@ -55,6 +55,13 @@ describe('ProxyWrapper', () => {
         
         expect(proxy + 1).to.equal(43);
     });
+    
+    if (typeof BigInt === 'function') { // Feature check (for older runtimes)
+        it('should not allow bigint', () => {
+            expect(() => { ProxyWrapper(10n, { ext: 42 }) }).to.throw(TypeError);
+            expect(() => { ProxyWrapper(10n, { ext: 42 }) }).to.throw(TypeError);
+        });
+    }
     
     it('should not allow boolean', () => {
         expect(() => { ProxyWrapper(true, { ext: 42 }) }).to.throw(TypeError);
