@@ -24,7 +24,9 @@ const statusMethods = {
 
 const defaultStatus : Status = { ready: false, loading: false, error: null };
 
-const LoadableProxy = <T>(item : null | T, status : Status = defaultStatus) : Loadable<T> => {
+const LoadableProxy = <T>(item : null | T, status : Status = {}) : Loadable<T> => {
+    const statusWithDefaults = Object.assign({}, defaultStatus, status);
+    
     // Prevent proxying multiple times (to prevent bugs where an object is repeatedly proxied over and over)
     if (typeof item === 'object' && item !== null && isProxyKey in item) {
         // TODO: maybe just unwrap the given proxy and override the status?
@@ -33,7 +35,10 @@ const LoadableProxy = <T>(item : null | T, status : Status = defaultStatus) : Lo
     
     // Note: use `statusMethods` as prototype, rather than adding it directly to the status object,
     // so that the methods are not copied when enumerating (e.g. by object spread).
-    const statusWithMethods : Status & StatusMethods<T> = Object.assign(Object.create(statusMethods), status);
+    const statusWithMethods : Status & StatusMethods<T> = Object.assign(
+        Object.create(statusMethods),
+        statusWithDefaults
+    );
     
     return ProxyWrapper(item, { [statusKey]: statusWithMethods, [itemKey]: item });
 };
