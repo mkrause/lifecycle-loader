@@ -158,7 +158,9 @@ const handlerMethods = {
 type Proxied<V, E> = E & (
     V extends undefined ? never
         : V extends null ? {}
+        : V extends string ? String
         : V extends number ? Number
+        : V extends bigint ? never
         : V extends boolean ? never
         : V extends symbol ? never
         : V
@@ -177,6 +179,8 @@ export const ProxyWrapper = <V, E extends Extension>(value : V, extension : E = 
         body = new String(value);
     } else if (typeof value === 'number') {
         body = new Number(value);
+    } else if (typeof value === 'bigint') {
+        throw new TypeError($msg`Cannot construct proxy from bigint, given ${value}`);
     } else if (typeof value === 'boolean') {
         // Note: we could use a boxed `Boolean`, but it would not be very useful because there's not much you can
         // do with it. For example, `!new Boolean(false)` is `false`, not `true`.
