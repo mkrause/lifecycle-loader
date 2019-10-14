@@ -176,6 +176,7 @@ const ProxyWrapper = <V, E extends Extension>(value : V, extension : E = {} as E
     } else if (typeof value === 'symbol') {
         throw new TypeError($msg`Cannot construct proxy from symbol, given ${value}`);
     } else if (typeof value !== 'object') {
+        // Note: this shouldn't happen, unless there's a new type of primitive added to JS
         throw new TypeError($msg`Cannot construct proxy, given value of unknown type: ${value}`);
     }
     
