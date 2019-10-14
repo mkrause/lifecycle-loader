@@ -15,13 +15,14 @@ Transparently wraps any value, with the exception of:
     (`instanceof` on the other hand will work fine.)
 */
 
-// TODO: provide some utilities to customize debug formatting (`inspect` for Node, and a custom DevTools formatter).
-
-const hasOwnProperty = (obj : object, propName : PropertyKey) =>
-    Object.prototype.hasOwnProperty.call(obj, propName);
+const hasOwnProperty = (obj : object, propKey : PropertyKey) =>
+    Object.prototype.hasOwnProperty.call(obj, propKey);
 
 type Extension = { [key in PropertyKey] : unknown };
-export const isProxyKey = Symbol('isProxy');
+export const proxyKey = Symbol('proxy-wrapper.proxy');
+
+
+const nodeInspectCustom = Symbol.for('nodejs.util.inspect.custom');
 
 const handlerMethods = {
     // Note in the following that `this` will always be set to the handler object (by Proxy internally).
@@ -49,19 +50,20 @@ const handlerMethods = {
         return bodyKeys;
     },
     
-    has<B, E extends Extension>({ body, extension } : { body : B, extension : E }, propName : PropertyKey) {
-        if (hasOwnProperty(extension, propName)) { return true; }
-        if (typeof body === 'object' && body !== null && propName in body) { return true; }
+    has<B, E extends Extension>({ body, extension } : { body : B, extension : E }, propKey : PropertyKey) {
+        if (hasOwnProperty(extension, propKey)) { return true; }
+        if (typeof body === 'object' && body !== null && propKey in body) { return true; }
         
         // Implement `toJSON` for boxed primitives
-        if (propName === 'toJSON') {
+        if (propKey === 'toJSON') {
             if (body instanceof String || body instanceof Number) {
                 return true;
             }
         }
         
-        // Backdoor, to allow checking whether this is a proxy
-        if (propName === isProxyKey) {
+        if (propKey === nodeInspectCustom) { return true; }
+        
+        if (propKey === proxyKey) {
             return true;
         }
         
@@ -70,24 +72,30 @@ const handlerMethods = {
     
     get<B, E extends Extension>(
         { body, extension } : { body : B, extension : E },
-        propName : PropertyKey,
+        propKey : PropertyKey,
         receiver : unknown
     ) {
         let targetProp = undefined;
-        if (hasOwnProperty(extension, propName)) {
-            targetProp = (extension as any)[propName]; // Cast to any (guaranteed by conditional)
-        } else if (typeof body === 'object' && body !== null && propName in body) {
-            targetProp = (body as any)[propName]; // Cast to any (guaranteed by conditional)
+        if (hasOwnProperty(extension, propKey)) {
+            targetProp = (extension as any)[propKey]; // Cast to any (guaranteed by conditional)
+        } else if (typeof body === 'object' && body !== null && propKey in body) {
+            targetProp = (body as any)[propKey]; // Cast to any (guaranteed by conditional)
         } else {
             // Fallback: property is not present in either the body or extension
             
             // Implement `toJSON` for boxed primitives (as a convenience)
-            if (propName === 'toJSON') {
+            if (propKey === 'toJSON') {
                 if (body instanceof String) {
                     targetProp = body.toString.bind(body);
                 } else if (body instanceof Number) {
                     targetProp = body.valueOf.bind(body);
                 }
+            }
+            
+            if (propKey === nodeInspectCustom) { return () => body; }
+            
+            if (propKey === proxyKey) {
+                return { body, extension };
             }
         }
         
@@ -117,11 +125,11 @@ const handlerMethods = {
     
     getOwnPropertyDescriptor<B, E extends Extension>(
         { body, extension } : { body : B, extension : E },
-        propName : PropertyKey
+        propKey : PropertyKey
     ) {
-        if (hasOwnProperty(extension, propName)) {
+        if (hasOwnProperty(extension, propKey)) {
             return {
-                value: (extension as any)[propName],
+                value: (extension as any)[propKey],
                 
                 // Make the extension prop non-enumerable, so it does not get copied (e.g. on `{ ...obj }` spread)
                 enumerable: false,
@@ -132,7 +140,7 @@ const handlerMethods = {
             };
         } else {
             if (typeof body === 'object' && body !== null) {
-                return Object.getOwnPropertyDescriptor(body, propName);
+                return Object.getOwnPropertyDescriptor(body, propKey);
             } else {
                 return undefined;
             }
@@ -156,7 +164,7 @@ type Proxied<V, E> = E & (
         : V
 );
 
-const ProxyWrapper = <V, E extends Extension>(value : V, extension : E = {} as E) => {
+export const ProxyWrapper = <V, E extends Extension>(value : V, extension : E = {} as E) => {
     let body : unknown = value;
     
     // Handle primitive values. Because a Proxy always behaves as an object, we cannot really transparently
@@ -189,5 +197,40 @@ const ProxyWrapper = <V, E extends Extension>(value : V, extension : E = {} as E
     // Cast to `Proxied<V, E>`, to assert that the proxy behaves like `V`, but extended with `E`
     return new Proxy({ body, extension }, handlerMethods) as any as Proxied<V, E>;
 };
+
+
+// Make formatting of proxies a little nicer
+declare const window : any;
+export const registerProxyFormatter = () => {
+    
+    if (typeof require === 'function') {
+        const util = require('util');
+        
+        if (util.inspect && util.inspect.replDefaults) {
+            util.inspect.replDefaults.showProxy = false;
+        }
+    }
+    
+    
+    // https://stackoverflow.com/questions/55733647/chrome-devtools-formatter-for-javascript-proxy
+    if (typeof window === 'object') {
+        const formatter = {
+            header(value : unknown) {
+                if (typeof value !== 'object' || value === null || !(proxyKey in value)) {
+                    return null;
+                }
+                
+                return ['object', { object: (value as any)[proxyKey].body }];
+            },
+        };
+        
+        if (!Array.isArray(window.devtoolsFormatters)) {
+            window.devtoolsFormatters = [];
+        }
+        
+        window.devtoolsFormatters.push(formatter);
+    }
+};
+
 
 export default ProxyWrapper;
