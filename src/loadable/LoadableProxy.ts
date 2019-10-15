@@ -4,7 +4,7 @@ import $msg from 'message-tag';
 import { statusKey, Status } from '../interfaces/Status.js';
 import { itemKey, Loadable, StatusMethods } from '../interfaces/Loadable.js';
 
-import ProxyWrapper, { isProxyKey } from '../util/ProxyWrapper.js';
+import ProxyWrapper, { proxyKey } from '../util/ProxyWrapper.js';
 
 
 const statusMethods = {
@@ -28,7 +28,7 @@ const LoadableProxy = <T>(item : null | T, status : Partial<Status> = {}) : Load
     const statusWithDefaults = { ...defaultStatus, ...status };
     
     // Prevent proxying multiple times (to prevent bugs where an object is repeatedly proxied over and over)
-    if (typeof item === 'object' && item !== null && isProxyKey in item) {
+    if (typeof item === 'object' && item !== null && proxyKey in item) {
         // TODO: maybe just unwrap the given proxy and override the status?
         throw new TypeError($msg`Cannot create a LoadableProxy from an item which is already a LoadableProxy`);
     }
