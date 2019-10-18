@@ -42,6 +42,10 @@ const handlerMethods = {
         //     ? Reflect.ownKeys(extension as any)
         //     : [];
         
+        if (body instanceof String) {
+            return [];
+        }
+        
         const bodyKeys = typeof body === 'object' && body !== null
             ? Reflect.ownKeys(body as any)
             : [];
@@ -52,7 +56,11 @@ const handlerMethods = {
     
     has<B, E extends Extension>({ body, extension } : { body : B, extension : E }, propKey : PropertyKey) {
         if (hasOwnProperty(extension, propKey)) { return true; }
-        if (typeof body === 'object' && body !== null && propKey in body) { return true; }
+        if (typeof body === 'object' && body !== null && propKey in body) {
+            if (body instanceof String) { return false; }
+            
+            return true;
+        }
         
         // Implement `toJSON` for boxed primitives
         if (propKey === 'toJSON') {

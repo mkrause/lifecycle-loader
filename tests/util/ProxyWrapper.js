@@ -38,6 +38,13 @@ describe('ProxyWrapper', () => {
         expect(proxy.toJSON()).to.equal('foo'); // Should also support `toJSON` (not a standard part of `String`)
         expect(JSON.stringify(proxy)).to.equal(`"foo"`);
         
+        // `Reflect.ownKeys(new String('foo'))` should equal `['0', '1', '2', 'length']`
+        // In JS, a boxed string is treated as an array when iterated over.
+        expect(Reflect.ownKeys(proxy)).to.deep.equal(['0', '1', '2', 'length']);
+        let keys = [];
+        for (let key in proxy) { keys.push(key); }
+        expect(keys).to.deep.equal(['0', '1', '2', 'length']);
+        
         expect(proxy.substring(0, 2)).to.equal('fo');
     });
     
@@ -52,6 +59,12 @@ describe('ProxyWrapper', () => {
         
         expect(proxy.toJSON()).to.equal(42); // Should also support `toJSON` (not a standard part of `Number`)
         expect(JSON.stringify(proxy)).to.equal(`42`);
+        
+        // `Reflect.ownKeys(new Number(42))` should equal `[]`
+        expect(Reflect.ownKeys(proxy)).to.deep.equal([]);
+        let keys = [];
+        for (let key in proxy) { keys.push(key); }
+        expect(keys).to.deep.equal([]);
         
         expect(proxy + 1).to.equal(43);
     });
