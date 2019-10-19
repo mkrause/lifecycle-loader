@@ -4,7 +4,7 @@ import $msg from 'message-tag';
 import { statusKey, Status } from '../interfaces/Status.js';
 import { itemKey, Loadable, StatusMethods } from '../interfaces/Loadable.js';
 
-import ProxyWrapper, { proxyKey } from '../util/ProxyWrapper.js';
+import ProxyExtend, { proxyKey } from 'proxy-extend';
 
 
 const statusMethods = {
@@ -40,7 +40,7 @@ const LoadableProxy = <T>(item : null | T, status : Partial<Status> = {}) : Load
         statusWithDefaults
     );
     
-    return ProxyWrapper(item, { [statusKey]: statusWithMethods, [itemKey]: item });
+    return ProxyExtend(item, { [statusKey]: statusWithMethods, [itemKey]: item });
 };
 
 /*

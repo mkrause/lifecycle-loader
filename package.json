@@ -38,6 +38,7 @@
         "chai": "^4.2.0"
     },
     "dependencies": {
-        "message-tag": "^0.4.0"
+        "message-tag": "^0.4.0",
+        "proxy-extend": "^0.2.0"
     }
 }
