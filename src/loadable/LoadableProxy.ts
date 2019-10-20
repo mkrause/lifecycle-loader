@@ -24,7 +24,8 @@ const statusMethods = {
 
 const defaultStatus : Status = { ready: false, loading: false, error: null };
 
-const LoadableProxy = <T>(item : null | T, status : Partial<Status> = {}) : Loadable<T> => {
+type Proxyable = null | string | number | object;
+const LoadableProxy = <T extends Proxyable>(item : null | T, status : Partial<Status> = {}) : Loadable<T> => {
     const statusWithDefaults = { ...defaultStatus, ...status };
     
     // Prevent proxying multiple times (to prevent bugs where an object is repeatedly proxied over and over)
