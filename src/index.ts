@@ -34,5 +34,5 @@ export const loader = <T>(
     ) => new LoadablePromise(executor, item);
 
 // Export some useful types
-export type Status = Status;
+export { Status };
 export type LoadableT<T> = Loadable<T>;
