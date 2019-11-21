@@ -24,13 +24,13 @@
         "prepublishOnly": "npm run build:esm && npm run build:cjs && npm run types"
     },
     "devDependencies": {
-        "@babel/core": "^7.6.3",
-        "@babel/cli": "^7.6.3",
-        "@babel/register": "^7.6.2",
-        "@babel/plugin-proposal-class-properties": "^7.5.5",
+        "@babel/core": "^7.7.2",
+        "@babel/cli": "^7.7.0",
+        "@babel/register": "^7.7.0",
+        "@babel/plugin-proposal-class-properties": "^7.7.0",
         "@babel/plugin-syntax-bigint": "^7.4.4",
         "babel-plugin-transform-builtin-extend": "^1.1.2",
-        "@babel/preset-env": "^7.6.3",
+        "@babel/preset-env": "^7.7.1",
         "@babel/preset-typescript": "^7.6.0",
         "typescript": "^3.6.3",
         "@types/node": "^12.7.12",
@@ -38,7 +38,7 @@
         "chai": "^4.2.0"
     },
     "dependencies": {
-        "message-tag": "^0.4.1",
-        "proxy-extend": "^0.4.0"
+        "message-tag": "^0.4.2",
+        "proxy-extend": "^0.5.2"
     }
 }
