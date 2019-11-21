@@ -22,12 +22,12 @@
         "prepublishOnly": "npm run build:esm && npm run build:cjs && cp flow/index.js.flow lib-cjs"
     },
     "devDependencies": {
-        "@babel/core": "^7.6.4",
-        "@babel/cli": "^7.6.4",
-        "@babel/register": "^7.6.2",
-        "@babel/plugin-proposal-class-properties": "^7.5.5",
+        "@babel/core": "^7.7.2",
+        "@babel/cli": "^7.7.0",
+        "@babel/register": "^7.7.0",
+        "@babel/plugin-proposal-class-properties": "^7.7.0",
         "babel-plugin-transform-builtin-extend": "^1.1.2",
-        "@babel/preset-env": "^7.6.3",
+        "@babel/preset-env": "^7.7.1",
         "@babel/preset-flow": "^7.0.0",
         "flow-bin": "^0.110.0",
         "flow-copy-source": "^2.0.8",
@@ -36,6 +36,6 @@
     },
     "dependencies": {
         "lodash": "^4.17.15",
-        "message-tag": "^0.4.1"
+        "message-tag": "^0.4.2"
     }
 }
