@@ -11,6 +11,8 @@ import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/
 
 export type Status = LoadableDefs.Status;
 export type Loadable<T> = LoadableDefs.Loadable<T>;
+
+// Wrap up the definitions in a single `Loadable` object, which can also be invocated as a function (uses Proxy)
 export const Loadable = Object.assign(
     <T extends LoadableDefs.Proxyable>(item : null | T, status : Partial<LoadableDefs.Status> = {}) =>
         LoadableDefs.LoadableProxy(item, status),
