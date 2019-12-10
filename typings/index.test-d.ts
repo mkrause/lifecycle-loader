@@ -1,3 +1,6 @@
+/*
+
+TODO
 
 import { statusKey, Status } from './interfaces/Status.js';
 import { itemKey, Loadable } from './interfaces/Loadable.js';
@@ -10,7 +13,7 @@ import LoadableSimple from './loadable/LoadableSimple.js';
 /*
 TODO:
   - fix StatusMethods implementation (some standardized way to update item value or status)
-*/
+* /
 
 type User = { readonly name : string };
 
@@ -61,3 +64,4 @@ const loadUserFail : LoadablePromise<User> = new LoadablePromise(
         console.log('error:', reason);
     }
 })();
+*/
