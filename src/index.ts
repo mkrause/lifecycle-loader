@@ -3,10 +3,9 @@ import * as LoadableDefs from './interfaces/Loadable.js';
 import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/Loader.js';
 
 // Loader implementations
-// import aggregateLoader from './loaders/aggregate_loader.js';
-// import constLoader from './loaders/const_loader.js';
-// import asyncLoader from './loaders/async_loader.js';
-// import webStorageLoader from './loaders/webstorage_loader.js';
+import constLoader from './loaders/const_loader.js';
+import aggregateLoader from './loaders/aggregate_loader.js';
+import webStorageLoader from './loaders/webstorage_loader.js';
 
 
 export type Status = LoadableDefs.Status;
@@ -30,16 +29,18 @@ export const Loadable = Object.assign(
     },
 );
 
+// Export explicitly, for convenience
+export const status = LoadableDefs.statusKey;
+
 
 export {
     LoadError,
     LoadablePromise,
     
     // Loaders
-    //aggregateLoader,
-    //constLoader,
-    //asyncLoader,
-    //webStorageLoader,
+    constLoader,
+    aggregateLoader,
+    webStorageLoader,
 };
 
 export const loader = <T>(

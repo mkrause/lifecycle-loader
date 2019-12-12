@@ -5,13 +5,11 @@ import { Status, Loadable, itemKey, statusKey } from './Loadable.js';
 
 
 // A *loader* is a function that takes an item (the current state), and returns a promise for
-// a new (loaded) item. To create such a loader, a loader creator may be used to build a loader
-// function from a given specification.
-
+// a new (loaded) item (so always async, by definition).
 export type Loader<T> = (item : Loadable<T>) => Promise<Loadable<T>>;
 
-type LoaderSpec = unknown;
-export type LoaderCreator<T> = (...args : Array<LoaderSpec>) => Loader<T>;
+// A *loader creator* is a function that returns a loader.
+export type LoaderCreator<T> = (...args : Array<unknown>) => Loader<T>;
 
 
 // Version of `Error` that keeps a reference to the item
@@ -35,8 +33,8 @@ type Rejecter = (reason ?: any) => void;
 type PromiseExecutor<T> = (resolve : Resolver<T>, reject : Rejecter) => void;
 
 // Extended version of `Promise` that works with loadable items.
-// Note: although the ES6 spec allows extending Promise, babel by default does not support
-// it. Can use `transform-builtin-extend` to support this.
+// Note: although the ES6 spec allows extending Promise, babel by default does not support it. Can
+// use the `transform-builtin-extend` plugin.
 // https://github.com/babel/babel/issues/1120
 // 
 // Note: should extending Promise become an issue, we could always fall back to just implementing

@@ -17,12 +17,12 @@ state, for UI purposes. All the possible combinations listed below.
 
 - !ready + !loading + !error     "pending", nothing done yet, not even attempted to load
 - !ready +  loading + !error     "loading", for the first time, no older data available
--  ready + !loading + !error     "idle", can use the data as needed
+-  ready + !loading + !error     "ready" (or "idle"), can use the data as needed
 -  ready +  loading + !error     "reloading", loading but there is still data available to show
-- !ready + !loading +  error     failed, and not yet any attempt to retry (no older data available)
-- !ready +  loading +  error     failed, but we're currently retrying (no older data available)
--  ready + !loading +  error     failed, and not yet any attempt to retry (there is older data available)
--  ready +  loading +  error     failed, but we're currently retrying (there is older data available)
+- !ready + !loading +  error     "failed", and not yet any attempt to retry (no older data available)
+- !ready +  loading +  error     "failed", but we're currently retrying (no older data available)
+-  ready + !loading +  error     "failed", and not yet any attempt to retry (there is older data available)
+-  ready +  loading +  error     "failed", but we're currently retrying (there is older data available)
 */
 export type Status = {
     loading : boolean,
@@ -50,6 +50,7 @@ export const LoadableSimple = <T>(item : null | T, status : Partial<Status> = {}
         // as an item type (at runtime anyway). Reason: `undefined` is likely a bug rather than an actual item, and
         // also it is useful to be able to use `undefined` to signify "lack of an argument" in certain methods (see
         // `asReady` for example).
+        // TODO: maybe just use `undefined` instead of `null` as placeholder for nonexistent item.
         if (typeof item === 'undefined') {
             throw new TypeError(`Could not construct LoadableSimple, given undefined`);
         }
@@ -97,12 +98,24 @@ export const LoadableProxy = <T extends Proxyable>(item : null | T, status : Par
 
 // Utility methods
 
+export const update = <T>(loadable : Loadable<T>, item : null | T, status : Status) =>
+    loadable[constructKey](item, status);
+export const updateValue = <T>(loadable : Loadable<T>, item : null | T) =>
+    loadable[constructKey](item, loadable[statusKey]);
+export const updateStatus = <T>(loadable : Loadable<T>, status : Status) =>
+    loadable[constructKey](loadable[itemKey], status);
 export const asLoading = <T>(loadable : Loadable<T>) =>
-    loadable[constructKey](loadable[itemKey], { ...loadable[statusKey], loading: true });
-export const asReady = <T>(loadable : Loadable<T>, item ?: T) =>
+    loadable[constructKey](
+        loadable[itemKey],
+        { ...loadable[statusKey], loading: true } // TODO: should we also clear any error here?
+    );
+export const asReady = <T>(loadable : Loadable<T>, item ?: null | T) =>
     loadable[constructKey](
         typeof item === 'undefined' ? loadable[itemKey] : item,
-        { ...loadable[statusKey], ready: true }
+        { ready: true, loading: false, error: null }
     );
 export const asFailed = <T>(loadable : Loadable<T>, reason : Error) =>
-    loadable[constructKey](loadable[itemKey], { ...loadable[statusKey], error: reason });
+    loadable[constructKey](
+        loadable[itemKey],
+        { ...loadable[statusKey], error: reason }
+    );

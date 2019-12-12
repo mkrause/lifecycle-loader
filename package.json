@@ -39,6 +39,6 @@
     },
     "dependencies": {
         "message-tag": "^0.4.2",
-        "proxy-extend": "^0.6.2"
+        "proxy-extend": "^1.0.0"
     }
 }
