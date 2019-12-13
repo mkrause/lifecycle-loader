@@ -23,6 +23,9 @@ export const Loadable = Object.assign(
         Simple: LoadableDefs.LoadableSimple,
         Proxy: LoadableDefs.LoadableProxy,
         
+        update: LoadableDefs.update,
+        updateValue: LoadableDefs.updateValue,
+        updateStatus: LoadableDefs.updateStatus,
         asLoading: LoadableDefs.asLoading,
         asReady: LoadableDefs.asReady,
         asFailed: LoadableDefs.asFailed,
