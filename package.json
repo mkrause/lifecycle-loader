@@ -33,12 +33,12 @@
         "@babel/preset-env": "^7.7.6",
         "@babel/preset-typescript": "^7.7.4",
         "typescript": "^3.7.3",
-        "@types/node": "^12.12.16",
+        "@types/node": "^12.12.17",
         "mocha": "^6.2.2",
         "chai": "^4.2.0"
     },
     "dependencies": {
         "message-tag": "^0.4.2",
-        "proxy-extend": "^1.0.0"
+        "proxy-extend": "^1.0.2"
     }
 }
