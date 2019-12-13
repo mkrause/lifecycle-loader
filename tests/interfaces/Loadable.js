@@ -5,10 +5,20 @@ import * as Loadable from '../../lib-esm/interfaces/Loadable.js';
 
 
 describe('Loadable', () => {
-    describe('status', () => {
-        it('should expose a unique status symbol', () => {
+    describe('symbols', () => {
+        it('should expose a unique `item` symbol', () => {
+            expect(typeof Loadable.itemKey).to.equal('symbol');
+            expect(Loadable.itemKey.description).to.equal('lifecycle.loadable.item');
+        });
+        
+        it('should expose a unique `status` symbol', () => {
             expect(typeof Loadable.statusKey).to.equal('symbol');
             expect(Loadable.statusKey.description).to.equal('lifecycle.loadable.status');
+        });
+        
+        it('should expose a unique `construct` symbol', () => {
+            expect(typeof Loadable.constructKey).to.equal('symbol');
+            expect(Loadable.constructKey.description).to.equal('lifecycle.loadable.construct');
         });
     });
     
