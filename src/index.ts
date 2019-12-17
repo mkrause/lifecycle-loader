@@ -26,6 +26,7 @@ export const Loadable = Object.assign(
         update: LoadableDefs.update,
         updateValue: LoadableDefs.updateValue,
         updateStatus: LoadableDefs.updateStatus,
+        asPending: LoadableDefs.asPending,
         asLoading: LoadableDefs.asLoading,
         asReady: LoadableDefs.asReady,
         asFailed: LoadableDefs.asFailed,

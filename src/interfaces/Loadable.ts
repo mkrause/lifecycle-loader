@@ -104,6 +104,8 @@ export const updateValue = <T>(loadable : Loadable<T>, item : null | T) =>
     loadable[constructKey](item, loadable[statusKey]);
 export const updateStatus = <T>(loadable : Loadable<T>, status : Status) =>
     loadable[constructKey](loadable[itemKey], status);
+export const asPending = <T>(loadable : Loadable<T>) =>
+    loadable[constructKey](null, { ready: false, loading: false, error: null });
 export const asLoading = <T>(loadable : Loadable<T>) =>
     loadable[constructKey](
         loadable[itemKey],
