@@ -31,7 +31,6 @@ module.exports = {
     ],
     plugins: [
         '@babel/proposal-class-properties',
-        '@babel/plugin-syntax-bigint',
         
         ['transform-builtin-extend', {
             // See: http://stackoverflow.com/questions/33870684/why-doesnt-instanceof-work
