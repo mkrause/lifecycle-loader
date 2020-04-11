@@ -4,11 +4,6 @@ import type { Proxyable, ProxyableExternal } from 'proxy-extend';
 import * as LoadableDefs from './interfaces/Loadable.js';
 import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/Loader.js';
 
-// Loader implementations
-import constLoader from './loaders/const_loader.js';
-import aggregateLoader from './loaders/aggregate_loader.js';
-import webStorageLoader from './loaders/webstorage_loader.js';
-
 
 export type Status = LoadableDefs.Status;
 export type Loadable<T> = LoadableDefs.Loadable<T>;
@@ -42,11 +37,6 @@ export const status = LoadableDefs.statusKey;
 export {
     LoadError,
     LoadablePromise,
-    
-    // Loaders
-    constLoader,
-    aggregateLoader,
-    webStorageLoader,
 };
 
 export const loader = <T>(
