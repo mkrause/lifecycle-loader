@@ -1,4 +1,6 @@
 
+import type { Proxyable, ProxyableExternal } from 'proxy-extend';
+
 import * as LoadableDefs from './interfaces/Loadable.js';
 import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/Loader.js';
 
@@ -13,7 +15,7 @@ export type Loadable<T> = LoadableDefs.Loadable<T>;
 
 // Wrap up the definitions in a single `Loadable` object, which can also be invocated as a function (uses Proxy)
 export const Loadable = Object.assign(
-    <T extends LoadableDefs.Proxyable>(item : null | T, status : Partial<LoadableDefs.Status> = {}) =>
+    <T extends Proxyable>(item : undefined | T, status : Partial<LoadableDefs.Status> = {}) =>
         LoadableDefs.LoadableProxy(item, status),
     {
         item: LoadableDefs.itemKey,
@@ -24,7 +26,7 @@ export const Loadable = Object.assign(
         Proxy: LoadableDefs.LoadableProxy,
         
         update: LoadableDefs.update,
-        updateValue: LoadableDefs.updateValue,
+        updateItem: LoadableDefs.updateItem,
         updateStatus: LoadableDefs.updateStatus,
         asPending: LoadableDefs.asPending,
         asLoading: LoadableDefs.asLoading,
@@ -33,7 +35,7 @@ export const Loadable = Object.assign(
     },
 );
 
-// Export explicitly, for convenience
+// Shorthand
 export const status = LoadableDefs.statusKey;
 
 

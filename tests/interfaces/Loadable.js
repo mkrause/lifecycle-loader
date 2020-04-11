@@ -7,18 +7,18 @@ import * as Loadable from '../../lib-esm/interfaces/Loadable.js';
 describe('Loadable', () => {
     describe('symbols', () => {
         it('should expose a unique `item` symbol', () => {
-            expect(typeof Loadable.itemKey).to.equal('symbol');
-            expect(Loadable.itemKey.description).to.equal('lifecycle.loadable.item');
+            expect(Loadable.itemKey).to.be.a('symbol');
+            expect(Loadable.itemKey).to.have.property('description').to.equal('lifecycle.loadable.item');
         });
         
         it('should expose a unique `status` symbol', () => {
-            expect(typeof Loadable.statusKey).to.equal('symbol');
-            expect(Loadable.statusKey.description).to.equal('lifecycle.loadable.status');
+            expect(Loadable.statusKey).to.be.a('symbol');
+            expect(Loadable.statusKey).to.have.property('description').to.equal('lifecycle.loadable.status');
         });
         
         it('should expose a unique `construct` symbol', () => {
-            expect(typeof Loadable.constructKey).to.equal('symbol');
-            expect(Loadable.constructKey.description).to.equal('lifecycle.loadable.construct');
+            expect(Loadable.constructKey).to.be.a('symbol');
+            expect(Loadable.constructKey).to.have.property('description').to.equal('lifecycle.loadable.construct');
         });
     });
     
@@ -26,23 +26,18 @@ describe('Loadable', () => {
         const LoadableSimple = Loadable.LoadableSimple;
         
         describe('construction', () => {
-            it('should not be constructable from undefined', () => {
-                expect(() => { LoadableSimple(); }).to.throw(TypeError);
-                expect(() => { LoadableSimple(undefined); }).to.throw(TypeError);
-            });
-            
-            it('should construct a loadable item from `null` (default status)', () => {
-                const loadable = LoadableSimple(null);
-                expect(loadable).to.have.property(Loadable.itemKey).to.equal(null);
-                expect(loadable).to.have.property(Loadable.statusKey).to.deep.equal({
+            it('should construct a resource with default status if given `undefined`', () => {
+                const resource = LoadableSimple();
+                expect(resource).to.have.property(Loadable.itemKey).to.equal(undefined);
+                expect(resource).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: false,
                     loading: false,
                     error: null,
                 });
                 
-                // Aliases
-                expect(loadable).to.have.property('item').to.equal(null);
-                expect(loadable).to.have.property('status').to.deep.equal({
+                // Non-symbol property key aliases
+                expect(resource).to.have.property('item').to.equal(undefined);
+                expect(resource).to.have.property('status').to.deep.equal({
                     ready: false,
                     loading: false,
                     error: null,
@@ -50,24 +45,24 @@ describe('Loadable', () => {
             });
             
             it('should accept a partial status', () => {
-                const loadable = LoadableSimple(null, { ready: true });
-                expect(loadable).to.have.property(Loadable.statusKey).to.deep.equal({
+                const resource = LoadableSimple(null, { ready: true });
+                expect(resource).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: true,
                     loading: false,
                     error: null,
                 });
             });
             
-            it('should construct a loadable item from non-trivial item and complete status', () => {
+            it('should construct a resource from non-trivial item and complete status', () => {
                 const reason = new Error('foo');
-                const loadable = LoadableSimple({ name: 'john' }, { ready: true, loading: true, error: reason });
+                const resource = LoadableSimple({ name: 'john' }, { ready: true, loading: true, error: reason });
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
-                    expect(loadable).to.have.property(key).to.deep.equal({ name: 'john' });
+                    expect(resource).to.have.property(key).to.deep.equal({ name: 'john' });
                 });
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
-                    expect(loadable).to.have.property(key).to.deep.equal({
+                    expect(resource).to.have.property(key).to.deep.equal({
                         ready: true,
                         loading: true,
                         error: reason,
@@ -77,20 +72,20 @@ describe('Loadable', () => {
         });
         
         describe('updating', () => {
-            const loadable = LoadableSimple({ name: 'john' });
+            const resource = LoadableSimple({ name: 'john' });
             
-            it('should be able to construct a new loadable item using an existing LoadableSimple instance', () => {
-                const loadableConstructed = loadable[Loadable.constructKey](
+            it('should be able to construct a new resource using an existing LoadableSimple instance', () => {
+                const resourceConstructed = resource[Loadable.constructKey](
                     { name: 'alice' },
                     { loading: true },
                 );
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
-                    expect(loadableConstructed).to.have.property(key).to.deep.equal({ name: 'alice' });
+                    expect(resourceConstructed).to.have.property(key).to.deep.equal({ name: 'alice' });
                 });
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
-                    expect(loadableConstructed).to.have.property(key).to.deep.equal({
+                    expect(resourceConstructed).to.have.property(key).to.deep.equal({
                         ready: false,
                         loading: true,
                         error: null,
@@ -98,15 +93,15 @@ describe('Loadable', () => {
                 });
             });
             
-            it('should be able to convert an existing loadable item to loading using `asLoading`', () => {
-                const loadableLoading = Loadable.asLoading(loadable);
+            it('should be able to convert an existing resource to loading using `asLoading`', () => {
+                const resourceLoading = Loadable.asLoading(resource);
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
-                    expect(loadableLoading).to.have.property(key).to.deep.equal({ name: 'john' });
+                    expect(resourceLoading).to.have.property(key).to.deep.equal({ name: 'john' });
                 });
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
-                    expect(loadableLoading).to.have.property(key).to.deep.equal({
+                    expect(resourceLoading).to.have.property(key).to.deep.equal({
                         ready: false,
                         loading: true, // Set to `true`
                         error: null,
@@ -114,16 +109,16 @@ describe('Loadable', () => {
                 });
             });
             
-            it('should be able to convert an existing loadable item to ready using `asReady`', () => {
+            it('should be able to convert an existing resource to ready using `asReady`', () => {
                 // Without new item
-                const loadableReady1 = Loadable.asReady(loadable);
+                const resourceReady1 = Loadable.asReady(resource);
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
-                    expect(loadableReady1).to.have.property(key).to.deep.equal({ name: 'john' });
+                    expect(resourceReady1).to.have.property(key).to.deep.equal({ name: 'john' });
                 });
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
-                    expect(loadableReady1).to.have.property(key).to.deep.equal({
+                    expect(resourceReady1).to.have.property(key).to.deep.equal({
                         ready: true, // Set to `true`
                         loading: false,
                         error: null,
@@ -131,14 +126,14 @@ describe('Loadable', () => {
                 });
                 
                 // With new item
-                const loadableReady2 = Loadable.asReady(loadable, { name: 'alice' });
+                const resourceReady2 = Loadable.asReady(resource, { name: 'alice' });
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
-                    expect(loadableReady2).to.have.property(key).to.deep.equal({ name: 'alice' });
+                    expect(resourceReady2).to.have.property(key).to.deep.equal({ name: 'alice' });
                 });
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
-                    expect(loadableReady2).to.have.property(key).to.deep.equal({
+                    expect(resourceReady2).to.have.property(key).to.deep.equal({
                         ready: true, // Set to `true`
                         loading: false,
                         error: null,
@@ -146,16 +141,16 @@ describe('Loadable', () => {
                 });
             });
             
-            it('should be able to convert an existing loadable item to failed using `asFailed`', () => {
+            it('should be able to convert an existing resource to failed using `asFailed`', () => {
                 const reason = new Error('fail');
-                const loadableFailed = Loadable.asFailed(loadable, reason);
+                const resourceFailed = Loadable.asFailed(resource, reason);
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
-                    expect(loadableFailed).to.have.property(key).to.deep.equal({ name: 'john' });
+                    expect(resourceFailed).to.have.property(key).to.deep.equal({ name: 'john' });
                 });
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
-                    expect(loadableFailed).to.have.property(key).to.deep.equal({
+                    expect(resourceFailed).to.have.property(key).to.deep.equal({
                         ready: false,
                         loading: false,
                         error: reason,
@@ -169,9 +164,14 @@ describe('Loadable', () => {
         const LoadableProxy = Loadable.LoadableProxy;
         
         describe('construction', () => {
-            it('should not be constructable from undefined', () => {
-                expect(() => { LoadableProxy(); }).to.throw(TypeError);
-                expect(() => { LoadableProxy(undefined); }).to.throw(TypeError);
+            it('should construct a resource with default status if given `undefined`', () => {
+                const resource = LoadableProxy();
+                expect(resource).to.have.property(Loadable.itemKey).to.equal(undefined);
+                expect(resource).to.have.property(Loadable.statusKey).to.deep.equal({
+                    ready: false,
+                    loading: false,
+                    error: null,
+                });
             });
             
             it('should construct a LoadableProxy without any properties from null', () => {
@@ -213,66 +213,66 @@ describe('Loadable', () => {
         });
         
         describe('updating', () => {
-            const loadable = LoadableProxy({ name: 'john' });
+            const resource = LoadableProxy({ name: 'john' });
             
-            it('should be able to construct a new loadable item using an existing LoadableProxy instance', () => {
-                const loadableConstructed = loadable[Loadable.constructKey](
+            it('should be able to construct a new resource using an existing LoadableProxy instance', () => {
+                const resourceConstructed = resource[Loadable.constructKey](
                     { name: 'alice' },
                     { loading: true },
                 );
                 
-                expect(loadableConstructed).to.deep.equal({ name: 'alice' });
+                expect(resourceConstructed).to.deep.equal({ name: 'alice' });
                 
-                expect(loadableConstructed).to.have.property(Loadable.statusKey).to.deep.equal({
+                expect(resourceConstructed).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: false,
                     loading: true,
                     error: null,
                 });
             });
             
-            it('should be able to convert an existing loadable item to loading using `asLoading`', () => {
-                const loadableLoading = Loadable.asLoading(loadable);
+            it('should be able to convert an existing resource to loading using `asLoading`', () => {
+                const resourceLoading = Loadable.asLoading(resource);
                 
-                expect(loadableLoading).to.deep.equal({ name: 'john' });
+                expect(resourceLoading).to.deep.equal({ name: 'john' });
                 
-                expect(loadableLoading).to.have.property(Loadable.statusKey).to.deep.equal({
+                expect(resourceLoading).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: false,
                     loading: true, // Set to `true`
                     error: null,
                 });
             });
             
-            it('should be able to convert an existing loadable item to ready using `asReady`', () => {
+            it('should be able to convert an existing resource to ready using `asReady`', () => {
                 // Without new item
-                const loadableReady1 = Loadable.asReady(loadable);
+                const resourceReady1 = Loadable.asReady(resource);
                 
-                expect(loadableReady1).to.deep.equal({ name: 'john' });
+                expect(resourceReady1).to.deep.equal({ name: 'john' });
                 
-                expect(loadableReady1).to.have.property(Loadable.statusKey).to.deep.equal({
+                expect(resourceReady1).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: true, // Set to `true`
                     loading: false,
                     error: null,
                 });
                 
                 // With new item
-                const loadableReady2 = Loadable.asReady(loadable, { name: 'alice' });
+                const resourceReady2 = Loadable.asReady(resource, { name: 'alice' });
                 
-                expect(loadableReady2).to.deep.equal({ name: 'alice' });
+                expect(resourceReady2).to.deep.equal({ name: 'alice' });
                 
-                expect(loadableReady2).to.have.property(Loadable.statusKey).to.deep.equal({
+                expect(resourceReady2).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: true, // Set to `true`
                     loading: false,
                     error: null,
                 });
             });
             
-            it('should be able to convert an existing loadable item to failed using `asFailed`', () => {
+            it('should be able to convert an existing resource to failed using `asFailed`', () => {
                 const reason = new Error('fail');
-                const loadableFailed = Loadable.asFailed(loadable, reason);
+                const resourceFailed = Loadable.asFailed(resource, reason);
                 
-                expect(loadableFailed).to.deep.equal({ name: 'john' });
+                expect(resourceFailed).to.deep.equal({ name: 'john' });
                 
-                expect(loadableFailed).to.have.property(Loadable.statusKey).to.deep.equal({
+                expect(resourceFailed).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: false,
                     loading: false,
                     error: reason,

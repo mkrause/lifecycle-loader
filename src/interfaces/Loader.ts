@@ -4,8 +4,8 @@ import $msg from 'message-tag';
 import { Status, Loadable, itemKey, statusKey } from './Loadable.js';
 
 
-// A *loader* is a function that takes an item (the current state), and returns a promise for
-// a new (loaded) item (so always async, by definition).
+// A *loader* is a function that takes a resource (the current state), and returns a promise for
+// a new (loaded) resource (so always async, by definition).
 export type Loader<T> = (item : Loadable<T>) => Promise<Loadable<T>>;
 
 // A *loader creator* is a function that returns a loader.
