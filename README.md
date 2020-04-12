@@ -50,17 +50,61 @@ function loadUserAction(dispatch) {
 This example uses redux with something like redux-thunk, but the exact choice of state management library/async middleware doesn't matter. The point is that we need to take a control flow, and turn it into a series of UI states (JavaScript values) that we can feed into the UI to tell it to render each successive state of the UI.
 
 This library intends to simplify handling of async state by providing a standard set of interfaces and tools.
-    </p>
-</details>
 
 
 ## Usage example
 
-```js
-import { status, Loadable, loadablePromise } from '@mkrause/lifecycle-loader';
-import api from './myApi.js';
+Use `Loadable` to annotate an object with a status:
 
-// Creating a loader
+```js
+import api from 'my-api';
+import { Loadable } from '@mkrause/lifecycle-loader';
+
+// Get a user from some API
+const userId = 42;
+const user = await api.fetchUser(userId);
+user; // { id: 42, name: 'John' }
+
+// Turn the user into a "loadable" resource (annotate with a status object)
+const userResource = Loadable(user);
+
+// Resource retains its original properties
+userResource.name; // 'John'
+
+// But now also has an associated status
+Loadable.getStatus(userResource); // { ready: true, loading: false, error: null }
+```
+
+We can use `Loadable` to create a *resource loader*, which automatically annotates the result with the appropriate status:
+
+```js
+import api from 'my-api';
+import { Loadable } from '@mkrause/lifecycle-loader';
+
+async function fetchUser(userId) {
+    const userResource = Loadable.asLoading(Loadable());
+    
+    try {
+        const user = await api.fetchUser(userId);
+        return Loadable.asReady(userResource, user);
+    } catch (reason) {
+        return Loadable.asFailed(userResource, reason);
+    }
+}
+
+// Fetching an existing user
+const user1 = await fetchUser(42);
+Loadable.getStatus(user1); // { ready: true, loading: false, error: null }
+
+// Fetching a nonexistant user
+const user2 = await fetchUser(999);
+Loadable.getStatus(user2); // { ready: false, loading: false, error: <Error> }
+```
+
+Alternatively, create a resource loader directly from a Promise:
+
+```js
+// Creating a loader (here, assume `api.fetchUser` is some function that returns a Promise for a user)
 const loadUser = userId => loadablePromise(api.fetchUser(userId));
 
 // We can still use `await` as usual:
@@ -86,7 +130,7 @@ loadUser(42)
 
 ## Reference
 
-**Status**
+### Status
 
 ```js
 type Status = {
@@ -100,73 +144,20 @@ A *status* is an object that describes the current loading state of some item. I
 
 * `ready`: Tells you whether the item can be safely used in the application. That is, whether the item is a valid value of the type expected by the application.
 * `loading`: Whether or not we are currently in the process of loading (or reloading) the item.
-* `error`: Whether there has been an error. Either `null` (no error), or some JS `Error` instance.
+* `error`: Whether there has been an error. Either `null` (no error), or some JavaScript `Error` instance.
 
-Note that any combination of these three properties is a valid status. For example, consider `ready: true` and `loading: true`. That means the we already have a valid item (that can be shown in the UI for instance), but we are also loading the item to get a newer version. In other words we're doing a reload. A complete list of possible combinations and their interpretations can be found [here](https://github.com/mkrause/lifecycle-loader/blob/master/src/status.js).
+Note that any combination of these three properties is a valid status. For example, consider `ready: true` and `loading: true`. That means the we already have a valid item (that can be shown in the UI for instance), but we are also loading the item to get a newer version. In other words we're doing a reload. A complete list of possible combinations and their interpretations can be found [here](https://github.com/mkrause/lifecycle-loader/blob/master/src/interfaces/Loadable.js).
 
 
-**Loadable**
+### Loadable
 
-The status of an item may be stored separate from the item itself. Usually this is what applications do and it makes sense. However, it is often convenient to keep the status in the same place as the item. If your state is a large tree hierarchy, then it may be cumbersome to have to manage the item and the status separately.
+**Loadable()**
 
-For this reason we provide a wrapper interface for "loadable items" called `Loadable`. A `Loadable` instance is any JS object which defines the `status` key. `status` is a special JS symbol that you can import from this library.
-
-```js
-import { status } from '@mkrause/lifecycle-loader';
-
-interface Loadable {
-    [status] : Status;
+```ts
+Loadable : <T>(item : T) => T & {
+    [Loadable.item] : T,
+    [Loadable.status] : Status,
 };
 ```
 
-You can either implement this property yourself (for types that you author), or you can use the `Loadable` proxy that's provided to transparently wrap around any existing JS object:
-
-
-```js
-import { status, Loadable } from '@mkrause/lifecycle-loader';
-
-const loadableDate = Loadable(new Date('2018-01-01'));
-loadableDate[status].ready; // false
-
-// The object is proxied, so you can still use it as usual:
-loadableDate.getFullYear(); // 2018
-```
-
-
-**Loader**
-
-A *loader* is a function which returns a `Loadable` item, usually asynchronously. It's similar to any regular `async` function in JavaScript (and in fact can be used using `await`), except that it keeps track of the `status` while the load process runs.
-
-```js
-import { status, Loadable, loader } from '@mkrause/lifecycle-loader';
-
-// Create a new loader (which in this case just returns a hardcoded result)
-const loadUser = user => loader(user, resolve => resolve({ name: 'John' }));
-
-(async () => {
-    // Somewhere in our application
-    const user = Loadable(null); // The item (currently empty)
-    user[status].ready === false;
-    
-    const userLoaded = await loadUser(user);
-    
-    userLoaded.name === 'John';
-    userLoaded[status].ready === true;
-})();
-```
-
-Due to the blocking nature of `await`, the above does not give us the opportunity to handle a "loading" state. If we want to handle that as well, then we can just fall back to promises:
-
-```js
-const user = Loadable(null);
-loadUser(user)
-    .then(user => {
-        user[status].ready === true;
-    })
-    .catch(error => {
-        user[status].error instanceof Error;
-    });
-
-// Loading
-user[status].loading === true;
-```
+`Loadable` creates takes some item and turns it into a *resource*. A resource has an interface similar to the original value, but also includes a *status*. The status can be accessed through the special `Loadable.status` symbol, or through the `Loadable.getStatus` utility method.
