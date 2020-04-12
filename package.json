@@ -1,7 +1,7 @@
 {
     "name": "@mkrause/lifecycle-loader",
-    "version": "0.0.5",
-    "description": "Utilities for managing the state lifecycle of async loaded data",
+    "version": "0.1.0-pre",
+    "description": "Utilities for managing the state lifecycle of async loaded resources",
     "author": "mkrause",
     "license": "MIT",
     "repository": "https://github.com/mkrause/lifecycle-loader",
@@ -12,30 +12,34 @@
     "files": [
         "src/",
         "lib-cjs/",
-        "lib-esm/"
+        "lib-esm/",
+        "typings/"
     ],
+    "typings": "./typings/index.d.ts",
     "scripts": {
-        "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --source-maps inline",
-        "build:esm": "NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --source-maps inline",
-        "test": "NODE_ENV=development BABEL_ENV=cjs mocha --require=@babel/register --recursive tests",
-        "prepare": "npm run build:esm && npm run build:cjs && cp flow/index.js.flow lib-cjs",
-        "prepublishOnly": "npm run build:esm && npm run build:cjs && cp flow/index.js.flow lib-cjs"
+        "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --extensions '.js,.ts' --source-maps inline",
+        "build:esm": "NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --extensions '.js,.ts' --source-maps inline",
+        "build:types": "tsc --project ./tsconfig.decl.json",
+        "check-types": "tsc",
+        "test:unit": "npm run build:esm && NODE_ENV=development BABEL_ENV=cjs mocha --require=@babel/register --recursive tests",
+        "test": "npm run test:unit && npm run check-types && echo '[tsc] success'",
+        "prepublishOnly": "npm run build:esm && npm run build:cjs && npm run build:types"
     },
     "devDependencies": {
-        "@babel/core": "^7.7.2",
-        "@babel/cli": "^7.7.0",
-        "@babel/register": "^7.7.0",
-        "@babel/plugin-proposal-class-properties": "^7.7.0",
+        "@babel/core": "^7.9.0",
+        "@babel/register": "^7.9.0",
+        "@babel/cli": "^7.8.4",
+        "@babel/preset-env": "^7.9.5",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
         "babel-plugin-transform-builtin-extend": "^1.1.2",
-        "@babel/preset-env": "^7.7.1",
-        "@babel/preset-flow": "^7.0.0",
-        "flow-bin": "^0.110.0",
-        "flow-copy-source": "^2.0.8",
-        "mocha": "^6.2.2",
+        "@babel/preset-typescript": "^7.9.0",
+        "typescript": "^3.8.3",
+        "@types/node": "^13.11.1",
+        "mocha": "^7.1.1",
         "chai": "^4.2.0"
     },
     "dependencies": {
-        "lodash": "^4.17.15",
-        "message-tag": "^0.4.2"
+        "message-tag": "^0.4.4",
+        "proxy-extend": "^1.2.0"
     }
 }
