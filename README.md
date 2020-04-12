@@ -7,7 +7,7 @@ Utilities for working with asynchronously loaded state.
 ## Motivation
 
 <details>
-    <summary><b>Motivation (click to open)</b></summary>
+    <summary><b>Click to show</b></summary>
     <p>
 When loading data asynchronously in JavaScript, you will use some kind of control flow. Using async/await, it might look something like this:
 
@@ -108,29 +108,7 @@ Loadable.getStatus(user2); // { ready: false, loading: false, error: <Error> }
 
 Alternatively, create a resource loader directly from a Promise:
 
-```js
-// Creating a loader (here, assume `api.fetchUser` is some function that returns a Promise for a user)
-const loadUser = userId => loadablePromise(api.fetchUser(userId));
-
-// We can still use `await` as usual:
-try {
-    const user = await loadUser(42);
-} catch (reason) {
-    console.error(reason);
-}
-
-// Or, we can subscribe to the result to get a 
-loadUser(42)
-    .subscribe(user => {
-        dispatch({ type: 'LOAD_USER', user });
-        
-        console.log(user[status]);
-    });
-
-// Logs:
-// - `{ ready: false, loading: true, error: null }`
-// - `{ ready: true, loading: false, error: null }`
-```
+[TODO]
 
 
 ## Reference
