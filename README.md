@@ -114,7 +114,7 @@ Alternatively, create a resource loader directly from a Promise:
 ```js
 import { Loadable, Loader } from '@mkrause/lifecycle-loader';
 
-
+// Works similar to the above
 async function fetchUser(userId) {
     return await Loader.fromPromise(api.fetchUser(userId));
 }
