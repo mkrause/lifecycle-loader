@@ -6,6 +6,9 @@ Utilities for working with asynchronously loaded state.
 
 ## Motivation
 
+<details>
+    <summary><b>Motivation (click to open)</b></summary>
+    <p>
 When loading data asynchronously in JavaScript, you will use some kind of control flow. Using async/await, it might look something like this:
 
 ```js
@@ -50,6 +53,8 @@ function loadUserAction(dispatch) {
 This example uses redux with something like redux-thunk, but the exact choice of state management library/async middleware doesn't matter. The point is that we need to take a control flow, and turn it into a series of UI states (JavaScript values) that we can feed into the UI to tell it to render each successive state of the UI.
 
 This library intends to simplify handling of async state by providing a standard set of interfaces and tools.
+    </p>
+</details>
 
 
 ## Usage example
