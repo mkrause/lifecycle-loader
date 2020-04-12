@@ -13,9 +13,9 @@ When loading data asynchronously in JavaScript, you will use some kind of contro
 
 ```js
 async function loadUser(userId) {
+    // Here, we are in a "LOADING" state
+    
     try {
-        // Here, we are in a "LOADING" state
-        
         const user = await api.fetchUser(userId);
         
         // Here, we are in a "READY" state
@@ -57,12 +57,11 @@ This library intends to simplify handling of async state by providing a standard
 </details>
 
 
-## Usage example
+## Usage
 
 Use `Loadable` to annotate an object with a status:
 
 ```js
-import api from 'my-api';
 import { Loadable } from '@mkrause/lifecycle-loader';
 
 // Get a user from some API
@@ -83,7 +82,6 @@ Loadable.getStatus(userResource); // { ready: true, loading: false, error: null 
 We can use `Loadable` to create a *resource loader*, which automatically annotates the result with the appropriate status:
 
 ```js
-import api from 'my-api';
 import { Loadable } from '@mkrause/lifecycle-loader';
 
 async function fetchUser(userId) {
@@ -108,7 +106,14 @@ Loadable.getStatus(user2); // { ready: false, loading: false, error: <Error> }
 
 Alternatively, create a resource loader directly from a Promise:
 
-[TODO]
+```js
+import { Loadable, Loader } from '@mkrause/lifecycle-loader';
+
+
+async function fetchUser(userId) {
+    return await Loader.fromPromise(api.fetchUser(userId));
+}
+```
 
 
 ## Reference

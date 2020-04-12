@@ -92,8 +92,10 @@ LoadableProxy: resource implementation that uses a Proxy, in order to expose an 
 as the item itself (status is "hidden" using a symbol key).
 */
 type LoadableProxyT<T extends Proxyable> = Loadable<T> & ProxyableExternal<T>;
-export const LoadableProxy = <T extends Proxyable>(item : undefined | T, status : Partial<Status> = {})
-    : LoadableProxyT<T> => {
+export const LoadableProxy = <T extends Proxyable>(
+        item ?: undefined | T,
+        status : Partial<Status> = {}
+    ) : LoadableProxyT<T> => {
         // If the status is ready, then `item` cannot be `undefined`
         if (status.ready === true && typeof item === 'undefined') {
             throw new TypeError('Expected an item, but given `undefined`');
@@ -150,4 +152,4 @@ export const asReady = <T>(resource : Loadable<T>, item ?: T) => update(resource
     { ready: true, loading: false, error: null }
 );
 export const asFailed = <T>(resource : Loadable<T>, reason : Error) =>
-    updateStatus(resource, { error: reason });
+    updateStatus(resource, { loading: false, error: reason });

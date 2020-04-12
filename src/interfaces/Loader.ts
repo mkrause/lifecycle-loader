@@ -1,7 +1,8 @@
 
 import $msg from 'message-tag';
+import type { Proxyable } from 'proxy-extend';
 
-import { Status, Loadable, itemKey, statusKey } from './Loadable.js';
+import { Status, Loadable, itemKey, statusKey, LoadableProxy, asReady, asFailed } from './Loadable.js';
 
 
 // A *loader* is a function that takes a resource (the current state), and returns a promise for
@@ -12,9 +13,12 @@ export type Loader<T> = (resource : Loadable<T>) => Promise<Loadable<T>>;
 export type LoaderCreator<T> = (...args : Array<unknown>) => Loader<T>;
 
 
+export const resourceKey = Symbol.for('lifecycle.loadable.loader-resource');
+
+
 // Version of `Error` that keeps a reference to the resource
 export class LoadError<T> extends Error {
-    readonly resource : Loadable<T>;
+    readonly [resourceKey] : Loadable<T>;
     
     constructor(reason : unknown, resource : Loadable<T>) {
         let message = reason;
@@ -23,10 +27,11 @@ export class LoadError<T> extends Error {
         }
         
         super($msg`Loading failed: ${message}`);
-        this.resource = resource;
+        this[resourceKey] = resource;
     }
 }
 
+/*
 // type Fulfill = (resolve : (result : unknown) => void, reject : (reason : unknown) => void) => void;
 type Resolver<T> = (value ?: T | PromiseLike<T>) => void;
 type Rejecter = (reason ?: any) => void;
@@ -108,3 +113,41 @@ export class LoadablePromise<T> extends Promise<Loadable<T>> {
         return this;
     }
 }
+*/
+
+
+export type PromiseWithResource<T> = PromiseLike<Loadable<T>> & {
+    [resourceKey] : Loadable<T>,
+    //subscribe : () => ..., // TODO
+};
+
+
+export const fromPromise = <T extends Proxyable>(
+        promise : PromiseLike<T>,
+        resource ?: Loadable<T>
+    ) : PromiseWithResource<T> => {
+        // Use the given resource, or use a LoadableProxy by default if none given
+        const resourceLoading : Loadable<T> = resource ?? LoadableProxy<T>(undefined, { loading: true });
+        
+        const promiseWithResource : PromiseWithResource<T> = Object.assign(
+            promise.then(
+                (result : T) => asReady(resourceLoading, result),
+                (reason : Error) => {
+                    throw new LoadError(reason, asFailed(resourceLoading, reason));
+                },
+            ),
+            {
+                [resourceKey]: resourceLoading,
+                subscribe(subscriber : (resource : Loadable<T>) => void) {
+                    subscriber(resourceLoading);
+                    
+                    promise.then(
+                        (result : T) => subscriber(asReady(resourceLoading, result)),
+                        (reason : Error) => subscriber(asFailed(resourceLoading, reason)),
+                    );
+                },
+            },
+        );
+        
+        return promiseWithResource;
+    };

@@ -2,7 +2,7 @@
 import type { Proxyable, ProxyableExternal } from 'proxy-extend';
 
 import * as LoadableDefs from './interfaces/Loadable.js';
-import { Loader, LoaderCreator, LoadError, LoadablePromise } from './interfaces/Loader.js';
+import * as LoaderDefs from './interfaces/Loader.js';
 
 
 export type Status = LoadableDefs.Status;
@@ -41,6 +41,7 @@ export const Loadable = Object.assign(
 export const status = LoadableDefs.statusKey;
 
 
+/*
 export {
     LoadError,
     LoadablePromise,
@@ -51,6 +52,13 @@ export const loader = <T>(
         executor : (resolve : (item : Loadable<T>) => void, reject : (item : Loadable<T>) => void) => void,
     ) =>
         new LoadablePromise(executor, item);
+*/
 
+export const Loader = {
+    resource: LoaderDefs.resourceKey,
+    fromPromise: LoaderDefs.fromPromise,
+};
+
+export type PromiseWithResource<T> = LoaderDefs.PromiseWithResource<T>;
 
 export default Loadable;
