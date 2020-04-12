@@ -13,13 +13,20 @@ export const Loadable = Object.assign(
     <T extends Proxyable>(item : undefined | T, status : Partial<LoadableDefs.Status> = {}) =>
         LoadableDefs.LoadableProxy(item, status),
     {
+        // Keys
         item: LoadableDefs.itemKey,
         status: LoadableDefs.statusKey,
         construct: LoadableDefs.constructKey,
         
+        // Constructors
         Simple: LoadableDefs.LoadableSimple,
         Proxy: LoadableDefs.LoadableProxy,
         
+        // Accessor functions
+        getItem: <T>(resource : Loadable<T>) => resource[LoadableDefs.itemKey],
+        getStatus: <T>(resource : Loadable<T>) => resource[LoadableDefs.statusKey],
+        
+        // Updater functions
         update: LoadableDefs.update,
         updateItem: LoadableDefs.updateItem,
         updateStatus: LoadableDefs.updateStatus,
@@ -30,7 +37,7 @@ export const Loadable = Object.assign(
     },
 );
 
-// Shorthand
+// Shorthand export
 export const status = LoadableDefs.statusKey;
 
 

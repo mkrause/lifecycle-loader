@@ -67,7 +67,11 @@ export const LoadableSimple = <T>(item : undefined | T, status : Partial<Status>
     //    throw new TypeError($msg`Expected \`undefined\`, but given ${item}`);
     //}
     
-    const statusWithDefaults = { ...defaultStatus, ...status };
+    const statusWithDefaults = {
+        ...defaultStatus,
+        ready: typeof item !== 'undefined',
+        ...status,
+    };
     
     const loadable : LoadableSimpleT<T> = {
         [itemKey]: item,
@@ -100,7 +104,11 @@ export const LoadableProxy = <T extends Proxyable>(item : undefined | T, status 
         //    throw new TypeError($msg`Expected \`undefined\`, but given ${item}`);
         //}
         
-        const statusWithDefaults = { ...defaultStatus, ...status }; // TODO: default ready value
+        const statusWithDefaults = {
+            ...defaultStatus,
+            ready: typeof item !== 'undefined',
+            ...status,
+        };
         
         // Prevent proxying multiple times (to prevent bugs where an object is repeatedly proxied over and over)
         if (extend.is(item)) {
@@ -126,27 +134,20 @@ export const LoadableProxy = <T extends Proxyable>(item : undefined | T, status 
 
 // Updater methods
 
-export const update = <T>(resource : Loadable<T>, item : undefined | T, status : Status) =>
-    resource[constructKey](item, status);
+export const update = <T>(resource : Loadable<T>, item : undefined | T, status : Partial<Status> = {}) =>
+    resource[constructKey](item, { ...resource[statusKey], ...status });
 export const updateItem = <T>(resource : Loadable<T>, item : undefined | T) =>
     resource[constructKey](item, resource[statusKey]);
-export const updateStatus = <T>(resource : Loadable<T>, status : Status) =>
-    resource[constructKey](resource[itemKey], status);
+export const updateStatus = <T>(resource : Loadable<T>, status : Partial<Status> = {}) =>
+    resource[constructKey](resource[itemKey], { ...resource[statusKey], ...status });
 
 export const asPending = <T>(resource : Loadable<T>) =>
-    resource[constructKey](undefined, { ready: false, loading: false, error: null });
+    update(resource, undefined, { ready: false, loading: false, error: null })
 export const asLoading = <T>(resource : Loadable<T>) =>
-    resource[constructKey](
-        resource[itemKey],
-        { ...resource[statusKey], loading: true } // TODO: should we also clear any error here?
-    );
-export const asReady = <T>(resource : Loadable<T>, item ?: T) =>
-    resource[constructKey](
-        typeof item === 'undefined' ? resource[itemKey] : item, // `item` is optional, if not present use existing
-        { ready: true, loading: false, error: null }
-    );
+    updateStatus(resource, { loading: true }); // TODO: should we also clear any error here?
+export const asReady = <T>(resource : Loadable<T>, item ?: T) => update(resource,
+    typeof item === 'undefined' ? resource[itemKey] : item, // `item` is optional, if not present use existing
+    { ready: true, loading: false, error: null }
+);
 export const asFailed = <T>(resource : Loadable<T>, reason : Error) =>
-    resource[constructKey](
-        resource[itemKey],
-        { ...resource[statusKey], error: reason }
-    );
+    updateStatus(resource, { error: reason });

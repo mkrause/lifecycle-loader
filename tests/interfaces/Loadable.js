@@ -72,10 +72,10 @@ describe('Loadable', () => {
         });
         
         describe('updating', () => {
-            const resource = LoadableSimple({ name: 'john' });
-            
             it('should be able to construct a new resource using an existing LoadableSimple instance', () => {
-                const resourceConstructed = resource[Loadable.constructKey](
+                const resource = LoadableSimple();
+                
+                const resourceConstructed = Loadable.update(resource,
                     { name: 'alice' },
                     { loading: true },
                 );
@@ -94,6 +94,8 @@ describe('Loadable', () => {
             });
             
             it('should be able to convert an existing resource to loading using `asLoading`', () => {
+                const resource = LoadableSimple({ name: 'john' });
+                
                 const resourceLoading = Loadable.asLoading(resource);
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
@@ -102,7 +104,7 @@ describe('Loadable', () => {
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
                     expect(resourceLoading).to.have.property(key).to.deep.equal({
-                        ready: false,
+                        ready: true,
                         loading: true, // Set to `true`
                         error: null,
                     });
@@ -110,6 +112,12 @@ describe('Loadable', () => {
             });
             
             it('should be able to convert an existing resource to ready using `asReady`', () => {
+                // Converting `undefined` to ready should throw an error
+                expect(() => { Loadable.asReady(LoadableSimple()); }).to.throw(TypeError);
+                
+                
+                const resource = LoadableSimple({ name: 'john' });
+                
                 // Without new item
                 const resourceReady1 = Loadable.asReady(resource);
                 
@@ -142,6 +150,8 @@ describe('Loadable', () => {
             });
             
             it('should be able to convert an existing resource to failed using `asFailed`', () => {
+                const resource = LoadableSimple({ name: 'john' });
+                
                 const reason = new Error('fail');
                 const resourceFailed = Loadable.asFailed(resource, reason);
                 
@@ -151,7 +161,7 @@ describe('Loadable', () => {
                 
                 [Loadable.statusKey, 'status'].forEach(key => {
                     expect(resourceFailed).to.have.property(key).to.deep.equal({
-                        ready: false,
+                        ready: true,
                         loading: false,
                         error: reason,
                     });
@@ -176,7 +186,7 @@ describe('Loadable', () => {
             
             it('should construct a LoadableProxy without any properties from null', () => {
                 expect(LoadableProxy(null)).to.have.property(Loadable.statusKey);
-                expect(LoadableProxy(42)[Loadable.statusKey]).to.have.property('ready', false);
+                expect(LoadableProxy(42)[Loadable.statusKey]).to.have.property('ready', true);
             });
             
             it('should not be constructable from a boolean', () => {
@@ -213,10 +223,10 @@ describe('Loadable', () => {
         });
         
         describe('updating', () => {
-            const resource = LoadableProxy({ name: 'john' });
-            
             it('should be able to construct a new resource using an existing LoadableProxy instance', () => {
-                const resourceConstructed = resource[Loadable.constructKey](
+                const resource = LoadableProxy();
+                
+                const resourceConstructed = Loadable.update(resource,
                     { name: 'alice' },
                     { loading: true },
                 );
@@ -231,18 +241,22 @@ describe('Loadable', () => {
             });
             
             it('should be able to convert an existing resource to loading using `asLoading`', () => {
+                const resource = LoadableProxy({ name: 'john' });
+                
                 const resourceLoading = Loadable.asLoading(resource);
                 
                 expect(resourceLoading).to.deep.equal({ name: 'john' });
                 
                 expect(resourceLoading).to.have.property(Loadable.statusKey).to.deep.equal({
-                    ready: false,
+                    ready: true,
                     loading: true, // Set to `true`
                     error: null,
                 });
             });
             
             it('should be able to convert an existing resource to ready using `asReady`', () => {
+                const resource = LoadableProxy({ name: 'john' });
+                
                 // Without new item
                 const resourceReady1 = Loadable.asReady(resource);
                 
@@ -267,13 +281,15 @@ describe('Loadable', () => {
             });
             
             it('should be able to convert an existing resource to failed using `asFailed`', () => {
+                const resource = LoadableProxy({ name: 'john' });
+                
                 const reason = new Error('fail');
                 const resourceFailed = Loadable.asFailed(resource, reason);
                 
                 expect(resourceFailed).to.deep.equal({ name: 'john' });
                 
                 expect(resourceFailed).to.have.property(Loadable.statusKey).to.deep.equal({
-                    ready: false,
+                    ready: true,
                     loading: false,
                     error: reason,
                 });
