@@ -129,7 +129,7 @@ async function fetchUser(userId) {
 type Status = {
     ready : boolean,
     loading : boolean,
-    error : ?Error,
+    error : null | Error,
 };
 ```
 
