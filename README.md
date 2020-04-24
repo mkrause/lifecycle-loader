@@ -2,6 +2,7 @@
 # lifecycle-loader
 
 [![npm](https://img.shields.io/npm/v/@mkrause/lifecycle-loader.svg?style=flat-square)](https://www.npmjs.com/package/@mkrause/lifecycle-loader)
+[![Travis](https://img.shields.io/travis/mkrause/lifecycle-loader.svg?style=flat-square)](https://travis-ci.org/mkrause/lifecycle-loader)
 ![MIT](https://img.shields.io/npm/l/@mkrause/lifecycle-loader?style=flat-square)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-blue.svg?style=flat-square)
 
