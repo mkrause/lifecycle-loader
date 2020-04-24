@@ -1,14 +1,11 @@
 {
     "name": "@mkrause/lifecycle-loader",
     "version": "0.1.0",
-    "description": "Utilities for managing the state lifecycle of async loaded resources",
     "author": "mkrause",
     "license": "MIT",
     "repository": "https://github.com/mkrause/lifecycle-loader",
-    "es2015": "src/index.js",
-    "main": "lib-cjs/index.js",
-    "module": "lib-esm/index.js",
-    "browser": "lib-esm/index.js",
+    "description": "Utilities for managing the state lifecycle of async loaded resources",
+    "keywords": [],
     "files": [
         "src/",
         "lib-cjs/",
@@ -16,9 +13,14 @@
         "typings/"
     ],
     "typings": "./typings/index.d.ts",
+    "engines": {
+        "node": ">= 10.13"
+    },
+    "main": "lib-cjs/index.js",
+    "module": "lib-esm/index.js",
     "scripts": {
-        "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --extensions '.js,.ts' --source-maps inline",
-        "build:esm": "NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --extensions '.js,.ts' --source-maps inline",
+        "build:cjs": "rm -rf ./lib-cjs && NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --extensions '.js,.ts' --out-file-extension=.cjs",
+        "build:esm": "rm -rf ./lib-esm && NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --extensions '.js,.ts' --out-file-extension=.mjs",
         "build:types": "tsc --project ./tsconfig.decl.json",
         "check-types": "tsc",
         "test:unit": "npm run build:esm && NODE_ENV=development BABEL_ENV=cjs mocha --require=@babel/register --recursive tests",
@@ -34,14 +36,14 @@
         "babel-plugin-transform-builtin-extend": "^1.1.2",
         "@babel/preset-typescript": "^7.9.0",
         "typescript": "^3.8.3",
-        "@types/node": "^13.11.1",
+        "@types/node": "^13.13.2",
         "mocha": "^7.1.1",
         "chai": "^4.2.0",
         "chai-as-promised": "^7.1.1",
         "sinon": "^9.0.0"
     },
     "dependencies": {
-        "message-tag": "^0.4.4",
-        "proxy-extend": "^1.2.0"
+        "message-tag": "^0.5.1",
+        "proxy-extend": "^1.2.1"
     }
 }
