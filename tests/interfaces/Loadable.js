@@ -9,31 +9,37 @@ describe('Loadable', () => {
         it('should expose a unique `item` symbol', () => {
             expect(Loadable.itemKey).to.be.a('symbol');
             
-            // XXX `<symbol>.description` does not yet work on Node v10
-            //expect(Loadable.itemKey).to.have.property('description').to.equal('lifecycle.loadable.item');
+            // Note: `<symbol>.description` is not yet supported in Node v10
+            if (Symbol.prototype.hasOwnProperty('description')) {
+                expect(Loadable.itemKey).to.have.property('description').to.equal('lifecycle.loadable.item');
+            }
         });
         
         it('should expose a unique `status` symbol', () => {
             expect(Loadable.statusKey).to.be.a('symbol');
             
-            // XXX `<symbol>.description` does not yet work on Node v10
-            //expect(Loadable.statusKey).to.have.property('description').to.equal('lifecycle.loadable.status');
+            // Note: `<symbol>.description` is not yet supported in Node v10
+            if (Symbol.prototype.hasOwnProperty('description')) {
+                expect(Loadable.statusKey).to.have.property('description').to.equal('lifecycle.loadable.status');
+            }
         });
         
         it('should expose a unique `construct` symbol', () => {
             expect(Loadable.constructKey).to.be.a('symbol');
             
-            // XXX `<symbol>.description` does not yet work on Node v10
-            //expect(Loadable.constructKey).to.have.property('description').to.equal('lifecycle.loadable.construct');
+            // Note: `<symbol>.description` is not yet supported in Node v10
+            if (Symbol.prototype.hasOwnProperty('description')) {
+                expect(Loadable.constructKey).to.have.property('description').to.equal('lifecycle.loadable.construct');
+            }
         });
     });
     
-    describe('LoadableSimple', () => {
-        const LoadableSimple = Loadable.LoadableSimple;
+    describe('LoadableRecord', () => {
+        const LoadableRecord = Loadable.LoadableRecord;
         
         describe('construction', () => {
             it('should construct a resource with default status if given `undefined`', () => {
-                const resource = LoadableSimple();
+                const resource = LoadableRecord();
                 expect(resource).to.have.property(Loadable.itemKey).to.equal(undefined);
                 expect(resource).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: false,
@@ -51,7 +57,7 @@ describe('Loadable', () => {
             });
             
             it('should accept a partial status', () => {
-                const resource = LoadableSimple(null, { ready: true });
+                const resource = LoadableRecord(null, { ready: true });
                 expect(resource).to.have.property(Loadable.statusKey).to.deep.equal({
                     ready: true,
                     loading: false,
@@ -61,7 +67,7 @@ describe('Loadable', () => {
             
             it('should construct a resource from non-trivial item and complete status', () => {
                 const reason = new Error('foo');
-                const resource = LoadableSimple({ name: 'john' }, { ready: true, loading: true, error: reason });
+                const resource = LoadableRecord({ name: 'john' }, { ready: true, loading: true, error: reason });
                 
                 [Loadable.itemKey, 'item'].forEach(key => {
                     expect(resource).to.have.property(key).to.deep.equal({ name: 'john' });
@@ -78,8 +84,8 @@ describe('Loadable', () => {
         });
         
         describe('updating', () => {
-            it('should be able to construct a new resource using an existing LoadableSimple instance', () => {
-                const resource = LoadableSimple();
+            it('should be able to construct a new resource using an existing LoadableRecord instance', () => {
+                const resource = LoadableRecord();
                 
                 const resourceConstructed = Loadable.update(resource,
                     { name: 'alice' },
@@ -100,7 +106,7 @@ describe('Loadable', () => {
             });
             
             it('should be able to convert an existing resource to loading using `asLoading`', () => {
-                const resource = LoadableSimple({ name: 'john' });
+                const resource = LoadableRecord({ name: 'john' });
                 
                 const resourceLoading = Loadable.asLoading(resource);
                 
@@ -119,10 +125,10 @@ describe('Loadable', () => {
             
             it('should be able to convert an existing resource to ready using `asReady`', () => {
                 // Converting `undefined` to ready should throw an error
-                expect(() => { Loadable.asReady(LoadableSimple()); }).to.throw(TypeError);
+                expect(() => { Loadable.asReady(LoadableRecord()); }).to.throw(TypeError);
                 
                 
-                const resource = LoadableSimple({ name: 'john' });
+                const resource = LoadableRecord({ name: 'john' });
                 
                 // Without new item
                 const resourceReady1 = Loadable.asReady(resource);
@@ -156,7 +162,7 @@ describe('Loadable', () => {
             });
             
             it('should be able to convert an existing resource to failed using `asFailed`', () => {
-                const resource = LoadableSimple({ name: 'john' });
+                const resource = LoadableRecord({ name: 'john' });
                 
                 const reason = new Error('fail');
                 const resourceFailed = Loadable.asFailed(resource, reason);

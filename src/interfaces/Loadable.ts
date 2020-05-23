@@ -50,13 +50,25 @@ export type Loadable<T> = {
     [constructKey] : (item : undefined | T, status : Status) => Loadable<T>,
 };
 
+export const isLoadable = (value : unknown) : value is Loadable<unknown> => {
+    if (typeof value !== 'object' || value === null) {
+        return false;
+    }
+    
+    return [
+        itemKey in value,
+        statusKey in value,
+        constructKey in value,
+    ].every(Boolean);
+};
+
 
 /*
-LoadableSimple: simple resource implementation that just stores the item and status in a plain object. Also
+LoadableRecord: simple resource implementation that just stores the item and status in a plain object. Also
 exposes these as regular (non-symbol) properties (so you can access them simply as `res.item` and `res.status`).
 */
-export type LoadableSimpleT<T> = Loadable<T> & { item : undefined | T, status : Status };
-export const LoadableSimple = <T>(item : undefined | T, status : Partial<Status> = {}) : LoadableSimpleT<T> => {
+export type LoadableRecordT<T> = Loadable<T> & { item : undefined | T, status : Status };
+export const LoadableRecord = <T>(item : undefined | T, status : Partial<Status> = {}) : LoadableRecordT<T> => {
     // If the status is ready, then `item` cannot be `undefined`
     if (status.ready === true && typeof item === 'undefined') {
         throw new TypeError('Expected an item, but given `undefined`');
@@ -73,10 +85,10 @@ export const LoadableSimple = <T>(item : undefined | T, status : Partial<Status>
         ...status,
     };
     
-    const loadable : LoadableSimpleT<T> = {
+    const loadable : LoadableRecordT<T> = {
         [itemKey]: item,
         [statusKey]: statusWithDefaults,
-        [constructKey]: LoadableSimple,
+        [constructKey]: LoadableRecord,
         
         // Also expose as regular (non-symbol) keys
         item,
@@ -119,6 +131,12 @@ export const LoadableProxy = <T extends Proxyable>(
             // TODO: maybe just unwrap the given proxy and override the status?
             //const { extension: { [itemKey]: _item, [statusKey]: _status } } = extend.unwrap(item);
         }
+        
+        // If the item itself is a loadable resource, return it as is?
+        // (Alternatively, unwrap it and convert to a LoadableProxy instead)
+        //if (isLoadable(item)) {
+        //    return item;
+        //}
         
         const itemProxyable = typeof item === 'undefined' ? null : item;
         

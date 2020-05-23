@@ -19,7 +19,7 @@ export const Loadable = Object.assign(
         construct: LoadableDefs.constructKey,
         
         // Constructors
-        Simple: LoadableDefs.LoadableSimple,
+        Record: LoadableDefs.LoadableRecord,
         Proxy: LoadableDefs.LoadableProxy,
         
         // Accessor functions
