@@ -2,7 +2,7 @@
 import { expectTypeOf } from 'expect-type';
 
 import type { Proxyable, ProxyableExternal } from 'proxy-extend';
-import Loadable from '..';
+import Loadable from '../src/index.js';
 
 
 {
