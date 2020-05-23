@@ -5,11 +5,13 @@
     ],
     "include": [
         "src/**/*",
+        "tests/types.ts",
     ],
     "compilerOptions": {
         "noEmit": true,
         "lib": ["es2020"],
         "allowJs": false,
         "strict": true,
+        "noErrorTruncation": true,
     },
 }
