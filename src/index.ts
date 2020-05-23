@@ -10,7 +10,7 @@ export type Loadable<T> = LoadableDefs.Loadable<T>;
 
 // Wrap up the definitions in a single `Loadable` object, which can also be invocated as a function (uses Proxy)
 export const Loadable = Object.assign(
-    <T extends Proxyable>(item : undefined | T, status : Partial<LoadableDefs.Status> = {}) =>
+    <T extends Proxyable>(item ?: undefined | T, status : Partial<LoadableDefs.Status> = {}) =>
         LoadableDefs.LoadableProxy(item, status),
     {
         // Keys

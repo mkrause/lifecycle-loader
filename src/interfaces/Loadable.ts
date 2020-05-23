@@ -68,7 +68,7 @@ LoadableRecord: simple resource implementation that just stores the item and sta
 exposes these as regular (non-symbol) properties (so you can access them simply as `res.item` and `res.status`).
 */
 export type LoadableRecordT<T> = Loadable<T> & { item : undefined | T, status : Status };
-export const LoadableRecord = <T>(item : undefined | T, status : Partial<Status> = {}) : LoadableRecordT<T> => {
+export const LoadableRecord = <T>(item ?: undefined | T, status : Partial<Status> = {}) : LoadableRecordT<T> => {
     // If the status is ready, then `item` cannot be `undefined`
     if (status.ready === true && typeof item === 'undefined') {
         throw new TypeError('Expected an item, but given `undefined`');
