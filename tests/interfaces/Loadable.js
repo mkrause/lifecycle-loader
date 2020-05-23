@@ -34,6 +34,45 @@ describe('Loadable', () => {
         });
     });
     
+    describe('isLoadable', () => {
+        it('should return false for primitives', () => {
+            [undefined, null, 'foo', 42, NaN, true, false].forEach(prim => {
+                expect(Loadable.isLoadable(prim)).to.equal(false);
+            });
+        });
+        
+        it('should return false for objects that are not Loadable', () => {
+            [{}, { x: 42 }, [], [1,2,3], x => x + 1].forEach(obj => {
+                expect(Loadable.isLoadable(obj)).to.equal(false);
+            });
+        });
+        
+        it('should return false for objects that are not Loadable', () => {
+            [{}, { x: 42 }, [], [1,2,3], x => x + 1].forEach(obj => {
+                expect(Loadable.isLoadable(obj)).to.equal(false);
+            });
+        });
+        
+        it('should return false for Loadable implementations with improper types', () => {
+            const improperLoadable = {
+                [Loadable.itemKey]: true,
+                [Loadable.statusKey]: 42,
+                [Loadable.constructKey]: 'x',
+            };
+            
+            expect(Loadable.isLoadable(improperLoadable)).to.equal(false);
+        });
+        
+        it('should return true for objects that implement Loadable', () => {
+            const loadable = {
+                [Loadable.itemKey]: () => {},
+                [Loadable.statusKey]: () => {},
+                [Loadable.constructKey]: () => {},
+            };
+            
+            expect(Loadable.isLoadable(loadable)).to.equal(true);
+        });
+    });
     describe('LoadableRecord', () => {
         const LoadableRecord = Loadable.LoadableRecord;
         

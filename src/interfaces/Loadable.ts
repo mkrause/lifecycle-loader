@@ -56,9 +56,9 @@ export const isLoadable = (value : unknown) : value is Loadable<unknown> => {
     }
     
     return [
-        itemKey in value,
-        statusKey in value,
-        constructKey in value,
+        itemKey in value && typeof (value as { [itemKey] : unknown })[itemKey] === 'function',
+        statusKey in value && typeof (value as { [statusKey] : unknown })[statusKey] === 'function',
+        constructKey in value && typeof (value as { [constructKey] : unknown })[constructKey] === 'function',
     ].every(Boolean);
 };
 
@@ -148,7 +148,7 @@ export const LoadableProxy = <T extends Proxyable>(
             [itemKey]: item,
             [statusKey]: statusWithDefaults,
             [constructKey]: LoadableProxy,
-        }) as LoadableProxyT<T>;
+        }) as unknown as LoadableProxyT<T>;
     };
 
 
