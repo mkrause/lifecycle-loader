@@ -50,14 +50,26 @@ export type Loadable<T> = {
     [constructKey] : (item : undefined | T, status : Status) => Loadable<T>,
 };
 
+export const isStatus = (value : unknown) : value is Status => {
+    if (typeof value !== 'object' || value === null) {
+        return false;
+    }
+    
+    return [
+        'ready' in value && typeof (value as Status).ready === 'boolean',
+        'loading' in value && typeof (value as Status).loading === 'boolean',
+        'error' in value && ((value as Status).error === null || (value as Status).error instanceof Error),
+    ].every(Boolean);
+};
+
 export const isLoadable = (value : unknown) : value is Loadable<unknown> => {
     if (typeof value !== 'object' || value === null) {
         return false;
     }
     
     return [
-        itemKey in value && typeof (value as { [itemKey] : unknown })[itemKey] === 'function',
-        statusKey in value && typeof (value as { [statusKey] : unknown })[statusKey] === 'function',
+        itemKey in value,
+        statusKey in value && typeof (value as { [statusKey] : unknown })[statusKey] === 'object',
         constructKey in value && typeof (value as { [constructKey] : unknown })[constructKey] === 'function',
     ].every(Boolean);
 };

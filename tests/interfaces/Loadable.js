@@ -34,6 +34,47 @@ describe('Loadable', () => {
         });
     });
     
+    describe('isStatus', () => {
+        it('should return false for primitives', () => {
+            [undefined, null, 'foo', 42, NaN, true, false].forEach(prim => {
+                expect(Loadable.isStatus(prim)).to.equal(false);
+            });
+        });
+        
+        it('should return false for objects that are not a Status', () => {
+            [{}, { x: 42 }, [], [1,2,3], x => x + 1].forEach(obj => {
+                expect(Loadable.isStatus(obj)).to.equal(false);
+            });
+        });
+        
+        it('should return false for Status implementations with improper types', () => {
+            const improperStatus = {
+                ready: undefined, // Wrong type (should be boolean)
+                loading: 42, // Wrong type (should be boolean)
+                error: new Date(), // Wrong type (should be null or `Error`)
+            };
+            
+            expect(Loadable.isStatus(improperStatus)).to.equal(false);
+        });
+        
+        it('should return true for objects that implement Status', () => {
+            const status1 = {
+                ready: true,
+                loading: false,
+                error: null,
+            };
+            
+            const status2 = {
+                ready: false,
+                loading: true,
+                error: null,
+            };
+            
+            expect(Loadable.isStatus(status1)).to.equal(true);
+            expect(Loadable.isStatus(status2)).to.equal(true);
+        });
+    });
+    
     describe('isLoadable', () => {
         it('should return false for primitives', () => {
             [undefined, null, 'foo', 42, NaN, true, false].forEach(prim => {
@@ -47,17 +88,11 @@ describe('Loadable', () => {
             });
         });
         
-        it('should return false for objects that are not Loadable', () => {
-            [{}, { x: 42 }, [], [1,2,3], x => x + 1].forEach(obj => {
-                expect(Loadable.isLoadable(obj)).to.equal(false);
-            });
-        });
-        
         it('should return false for Loadable implementations with improper types', () => {
             const improperLoadable = {
                 [Loadable.itemKey]: true,
-                [Loadable.statusKey]: 42,
-                [Loadable.constructKey]: 'x',
+                [Loadable.statusKey]: 42, // Wrong type (should be object)
+                [Loadable.constructKey]: 'x', // Wrong type (should be function)
             };
             
             expect(Loadable.isLoadable(improperLoadable)).to.equal(false);
@@ -65,14 +100,15 @@ describe('Loadable', () => {
         
         it('should return true for objects that implement Loadable', () => {
             const loadable = {
-                [Loadable.itemKey]: () => {},
-                [Loadable.statusKey]: () => {},
+                [Loadable.itemKey]: true,
+                [Loadable.statusKey]: { ready: true, loading: false, error: new Error() },
                 [Loadable.constructKey]: () => {},
             };
             
             expect(Loadable.isLoadable(loadable)).to.equal(true);
         });
     });
+    
     describe('LoadableRecord', () => {
         const LoadableRecord = Loadable.LoadableRecord;
         

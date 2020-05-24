@@ -3,7 +3,7 @@
 
 - v0.2.x
   - Rename LoadableSimple -> LoadableRecord
-  - Add type guard: `isLoadable`
+  - Add type guards: `isStatus`, `isLoadable`
 
 - v0.1.x
   - Rewrite in TypeScript.

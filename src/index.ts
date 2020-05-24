@@ -18,6 +18,7 @@ export const Loadable = Object.assign(
         status: LoadableDefs.statusKey,
         construct: LoadableDefs.constructKey,
         
+        isStatus: LoadableDefs.isStatus,
         isLoadable: LoadableDefs.isLoadable,
         
         // Constructors
@@ -41,6 +42,7 @@ export const Loadable = Object.assign(
 
 // Shorthand exports
 export const status = LoadableDefs.statusKey;
+export const isStatus = LoadableDefs.isStatus;
 export const isLoadable = LoadableDefs.isLoadable;
 
 
