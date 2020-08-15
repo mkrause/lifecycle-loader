@@ -16,8 +16,8 @@
     "engines": {
         "node": ">= 10.13"
     },
-    "main": "lib-cjs/index.js",
-    "module": "lib-esm/index.js",
+    "main": "./lib-cjs/index.js",
+    "module": "./lib-esm/index.js",
     "scripts": {
         "_build": "babel src --extensions '.js,.ts' --source-maps=true",
         "build:cjs": "NODE_ENV=production BABEL_ENV=cjs npm run _build -- --out-dir lib-cjs --delete-dir-on-start",
