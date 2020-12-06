@@ -1,5 +1,6 @@
 
 import type { Proxyable, ProxyableExternal } from 'proxy-extend';
+import { isProxyable } from 'proxy-extend';
 
 import * as LoadableDefs from './interfaces/Loadable.js';
 import * as LoaderDefs from './interfaces/Loader.js';
@@ -44,6 +45,9 @@ export const Loadable = Object.assign(
 export const status = LoadableDefs.statusKey;
 export const isStatus = LoadableDefs.isStatus;
 export const isLoadable = LoadableDefs.isLoadable;
+
+// Utilities
+export { isProxyable };
 
 
 /*

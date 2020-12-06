@@ -43,7 +43,7 @@ export const constructKey = Symbol.for('lifecycle.loadable.construct');
 
 // A *resource* (or "Loadable") is an object that has both an item and a status.
 export type Loadable<T> = {
-    [itemKey] : undefined | T, // May be `undefined`, if not ready
+    [itemKey] : undefined | T, // May be `undefined` when status is not ready (if ready *must not* be `undefined`)
     [statusKey] : Status,
     
     // Construct a new resource from this one, using the given item and status
@@ -55,23 +55,19 @@ export const isStatus = (value : unknown) : value is Status => {
         return false;
     }
     
-    return [
-        'ready' in value && typeof (value as Status).ready === 'boolean',
-        'loading' in value && typeof (value as Status).loading === 'boolean',
-        'error' in value && ((value as Status).error === null || (value as Status).error instanceof Error),
-    ].every(Boolean);
+    return 'ready' in value && typeof (value as Status).ready === 'boolean'
+        && 'loading' in value && typeof (value as Status).loading === 'boolean'
+        && 'error' in value && ((value as Status).error === null || (value as Status).error instanceof Error);
 };
 
 export const isLoadable = (value : unknown) : value is Loadable<unknown> => {
-    if (typeof value !== 'object' || value === null) {
+    if (!(typeof value === 'object' && value !== null)) {
         return false;
     }
     
-    return [
-        itemKey in value,
-        statusKey in value && typeof (value as { [statusKey] : unknown })[statusKey] === 'object',
-        constructKey in value && typeof (value as { [constructKey] : unknown })[constructKey] === 'function',
-    ].every(Boolean);
+    return itemKey in value
+        && statusKey in value && typeof (value as { [statusKey] : unknown })[statusKey] === 'object'
+        && constructKey in value && typeof (value as { [constructKey] : unknown })[constructKey] === 'function';
 };
 
 
@@ -117,7 +113,6 @@ as the item itself (status is "hidden" using a symbol key).
 */
 type LoadableProxyT<T extends Proxyable> = Loadable<T>
     & (T extends undefined ? ProxyableExternal<null> : ProxyableExternal<T>);
-type TEST = LoadableProxyT<Proxyable>;
 export const LoadableProxy = <T extends Proxyable>(
         item ?: undefined | T,
         status : Partial<Status> = {}
