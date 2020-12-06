@@ -7,7 +7,7 @@
 ![TypeScript](https://img.shields.io/badge/-TypeScript-blue.svg?style=flat-square)
 
 
-Utilities for working with asynchronously loaded state.
+Utilities for working with asynchronously loaded state. This library is intended to be used as a primitive within a higher-level API library, see for example: [lifecycle-rest](https://github.com/mkrause/lifecycle-rest).
 
 
 ## Motivation
@@ -15,13 +15,12 @@ Utilities for working with asynchronously loaded state.
 <details>
     <summary><b>Click to show</b></summary>
     <p>
-When loading data asynchronously in JavaScript, you will use some kind of control flow. Using async/await, it might look something like this:
+When fetching data asynchronously in JavaScript, you will write some kind of control flow. Using async/await, it might look something like this:
 
 ```js
-async function loadUser(userId) {
-    // Here, we are in a "LOADING" state
-    
+const loadUser = async userId => {
     try {
+        // Between the following call and when the promise is resolved, we are in a "LOADING" state
         const user = await api.fetchUser(userId);
         
         // Here, we are in a "READY" state
@@ -30,10 +29,10 @@ async function loadUser(userId) {
         // Here, we are in a "FAILED" state
         throw reason;
     }
-}
+};
 ```
 
-When rendering a UI, we don't just care about the result of this function, we also care about the intermediate states. For example, when we start loading the user we may want to show a loading indicator.
+When rendering a UI, we don't just care about the *result* of this function, we also care about the intermediate states. For example, when we start loading the user we may want to show a loading indicator.
 
 Additionally, we will often want to keep information about previous loading attempts. For example, after rendering the user info once succesfully, we may want to reload it at some point. While the new data is loaded, we want to keep the old user data to show on the screen (with a loading indicator). If there are any error messages, we may want to remember those as well in order to be able to show them even after a reload attempt.
 
@@ -41,22 +40,23 @@ To handle such use cases we will need to "reify" the control flow somehow. For e
 
 ```js
 // Example: using redux + redux-thunk
-function loadUserAction(dispatch) {
-    return async userId => {
-        dispatch({ type: 'LOAD_USER', status: 'LOADING' });
+const loadUserAction = userId => async dispatch => {
+    dispatch({ type: 'LOAD_USER', status: 'LOADING' });
+    
+    try {
+        const user = await api.fetchUser(userId);
         
-        try {
-            const user = await api.fetchUser(userId);
-            
-            dispatch({ type: 'LOAD_USER', status: 'READY', user });
-        } catch (reason) {
-            dispatch({ type: 'LOAD_USER', status: 'FAILED', reason });
-        }
-    };
-}
+        dispatch({ type: 'LOAD_USER', status: 'READY', user });
+    } catch (reason) {
+        dispatch({ type: 'LOAD_USER', status: 'FAILED', reason });
+    }
+};
+
+// Dispatch the thunk to the redux store
+dispatch(loadUserAction(42));
 ```
 
-This example uses redux with something like redux-thunk, but the exact choice of state management library/async middleware doesn't matter. The point is that we need to take a control flow, and turn it into a series of UI states (JavaScript values) that we can feed into the UI to tell it to render each successive state of the UI.
+This example uses redux with redux-thunk, but the exact choice of state management library/async middleware doesn't matter. The point is that we need to take a control flow, and turn it into a series of UI states (JavaScript values) that we can feed into the UI to tell it to render each successive state of the UI.
 
 This library intends to simplify handling of async state by providing a standard set of interfaces and tools.
     </p>
@@ -65,32 +65,114 @@ This library intends to simplify handling of async state by providing a standard
 
 ## Usage
 
-Use `Loadable` to annotate an object with a status:
+`Loadable` takes some data (or "item") and annotates it with a *status*:
 
 ```js
 import { Loadable } from '@mkrause/lifecycle-loader';
 
-// Get a user from some API
-const userId = 42;
-const user = await api.fetchUser(userId);
-user; // { id: 42, name: 'John' }
+// Some "item"
+const user = { id: 42, name: 'John' };
 
-// Turn the user into a "loadable" resource (annotate with a status object)
+// Create a Loadable "resource" from the given item
 const userResource = Loadable(user);
 
-// Resource retains its original properties
-userResource.name; // 'John'
+// The resource has the same interface as the original item (its properties are maintained)
+console.log(userResource.name); // 'John'
 
-// But now also has an associated status
-Loadable.getStatus(userResource); // { ready: true, loading: false, error: null }
+// ...but now it also has an associated status (through the `Loadable.status` symbol)
+const userStatus = userResource[Loadable.status]; // { ready: true, loading: false, error: null }
 ```
 
-We can use `Loadable` to create a *resource loader*, which automatically annotates the result with the appropriate status:
+The *status* consists of the following flags:
+
+* `ready : boolean` Indicates whether there is an item present (i.e. whether there is data we can use).
+* `loading : boolean` Indicates whether this resource is currently being (re)loaded.
+* `error : null | Error` Contains the error for the most recent load attempt, or `null` if no error.
+
+Each of these three flags are independent of each other. For example, a resource may be `ready` and yet have an `error` associated with it. In that case, the UI is able to read the item data to show on the screen, and also show the error to the user to indicate the newest data could not be fetched.
+
+<details>
+    <summary><b>Summary of different status flag combinations and their interpretations</b></summary>
+    <table>
+        <thead>
+            <tr>
+                <th>Flags</th>
+                <th>State</th>
+                <th>Meaning</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>!ready && !loading && !error</code></td>
+                <td>"pending"</td>
+                <td>Nothing done yet, not even attempted to load</td>
+            </tr>
+            <tr>
+                <td><code>!ready && loading && !error</code></td>
+                <td>"loading"</td>
+                <td>In the process of loading item, no current (cached) item available</td>
+            </tr>
+            <tr>
+                <td><code>ready && !loading && !error</code></td>
+                <td>"ready"</td>
+                <td>Item is ready to be used, no loading or error</td>
+            </tr>
+            <tr>
+                <td><code>ready && loading && !error</code></td>
+                <td>"reloading"</td>
+                <td>Item is ready, but we are also reloading a new version</td>
+            </tr>
+            <tr>
+                <td><code>!ready && !loading && error</code></td>
+                <td>"failed (pending)"</td>
+                <td>Loading has failed, no cached item and no reload attempt</td>
+            </tr>
+            <tr>
+                <td><code>!ready && loading && error</code></td>
+                <td>"failed (loading)"</td>
+                <td>Loading has failed, no cached item, currently trying again</td>
+            </tr>
+            <tr>
+                <td><code>ready && !loading && error</code></td>
+                <td>"failed (ready)"</td>
+                <td>Loading has failed, cached item available, no reload attempt</td>
+            </tr>
+            <tr>
+                <td><code>ready && loading && error</code></td>
+                <td>"failed (reloading)"</td>
+                <td>Loading has failed, cached item available, currently trying again</td>
+            </tr>
+        </tbody>
+    </table>
+</details>
+
+The `Loadable.status` property is nonenumerable. If you try to copy a resource (e.g. using a spread operator, `{ ...resource }`), the status will be lost. To perform an immutable update on a resource, you can use `Loadable.update`:
+
+```js
+// Create a copy of `userResource` with an updated `name` and the `loading` status flag set to true
+const userUpdated = Loadable.update(userResource, { ...userResource, name: 'Bob' }, { loading: true });
+
+// Or use a shorthand:
+Loadable.asPending(resource); // Clear data and reset status to "pending"
+Loadable.asLoading(resource); // Set status to "loading"
+Loadable.asReady(resource, item); // Set status to "ready"
+Loadable.asFailed(resource, reason); // Set status to "failed"
+```
+
+
+## Resource loaders
+
+This library is intended to be used as a low-level primitive for an API service. We will refer to a function that performs an API call and returns a Loadable as a *resource loader*.
+
+**With async/await**
+
+We can write a resource loader using async/await as follows:
 
 ```js
 import { Loadable } from '@mkrause/lifecycle-loader';
+import api from './my_api.js';
 
-async function fetchUser(userId) {
+const fetchUser = async userId => {
     const userResource = Loadable.asLoading(Loadable());
     
     try {
@@ -99,25 +181,48 @@ async function fetchUser(userId) {
     } catch (reason) {
         return Loadable.asFailed(userResource, reason);
     }
-}
+};
 
 // Fetching an existing user
 const user1 = await fetchUser(42);
-Loadable.getStatus(user1); // { ready: true, loading: false, error: null }
+user1[Loadable.status]; // { ready: true, loading: false, error: null }
 
-// Fetching a nonexistant user
+// Fetching a nonexistent user
 const user2 = await fetchUser(999);
-Loadable.getStatus(user2); // { ready: false, loading: false, error: <Error> }
+user2[Loadable.status]; // { ready: false, loading: false, error: <Error> }
 ```
 
-Alternatively, create a resource loader directly from a Promise:
+The downside is that, since `await` stops execution until the promise is resolved, the function has no discernible "loading" state. Even if we don't await the `fetchUser` call, we just get a Promise, not a Loadable resource.
+
+```js
+const userPromise = fetchUser(42);
+// `userPromise` is just a Promise, cannot retrieve a resource from it
+```
+
+What we'd like is to be able to return a user resource in "loading" state from the `fetchUser` call.
+
+**With `Loader.fromPromise`**
 
 ```js
 import { Loadable, Loader } from '@mkrause/lifecycle-loader';
+import api from './my_api.js';
 
-// Works similar to the above
-async function fetchUser(userId) {
-    return await Loader.fromPromise(api.fetchUser(userId));
+// Same as above, but returns a Promise with `Loader.resource` property
+const fetchUser = userId => {
+    return Loader.fromPromise(api.fetchUser(userId));
+};
+
+const userPromise = fetchUser(42);
+const userLoading = userPromise[Loader.resource];
+console.log(userLoading[Loadable.status]); // { ready: false, loading: true, error: null }
+
+try {
+    const userReady = await userPromise;
+    console.log(userReady[Loadable.status]); // { ready: true, loading: false, error: null }
+} catch (error) {
+    // `error` is of type `LoadError`, and has an associated resource
+    const userFailed = error[Loader.resource];
+    console.log(userFailed[Loadable.status]); // { ready: false, loading: false, error: <reason> }
 }
 ```
 
@@ -126,11 +231,11 @@ async function fetchUser(userId) {
 
 ### Status
 
-```js
+```typescript
 type Status = {
-    ready : boolean,
-    loading : boolean,
-    error : null | Error,
+    ready: boolean,
+    loading: boolean,
+    error: null | Error,
 };
 ```
 
@@ -147,10 +252,10 @@ Note that any combination of these three properties is a valid status. For examp
 
 **Loadable()**
 
-```ts
-Loadable : <T>(item : T) => T & {
-    [Loadable.item] : T,
-    [Loadable.status] : Status,
+```typescript
+Loadable: <T>(item: T) => T & {
+    [Loadable.item]: T,
+    [Loadable.status]: Status,
 };
 ```
 
