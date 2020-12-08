@@ -111,7 +111,7 @@ export const LoadableRecord = <T>(item ?: undefined | T, status : Partial<Status
 LoadableProxy: resource implementation that uses a Proxy, in order to expose an interface that appears the same
 as the item itself (status is "hidden" using a symbol key).
 */
-type LoadableProxyT<T extends Proxyable> = Loadable<T>
+export type LoadableProxyT<T extends Proxyable> = Loadable<T>
     & (T extends undefined ? ProxyableExternal<null> : ProxyableExternal<T>);
 export const LoadableProxy = <T extends Proxyable>(
         item ?: undefined | T,
