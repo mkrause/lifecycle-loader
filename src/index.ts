@@ -8,7 +8,8 @@ import * as LoaderDefs from './interfaces/Loader.js';
 
 export type Status = LoadableDefs.Status;
 export type Loadable<T> = LoadableDefs.Loadable<T>;
-export type LoadableProxy<T> = LoadableDefs.LoadableProxyT<T>;
+export type { Proxyable };
+export type LoadableProxy<T extends Proxyable> = LoadableDefs.LoadableProxyT<T>;
 
 // Wrap up the definitions in a single `Loadable` object, which can also be invocated as a function (uses Proxy)
 export const Loadable = Object.assign(
