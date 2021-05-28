@@ -1,6 +1,10 @@
 
 # Changelog
 
+- v0.3.x
+  - Drop support for Node v10
+  - Drop support for some older browsers (including all versions of IE)
+
 - v0.2.x
   - Rename LoadableSimple -> LoadableRecord
   - Add type guards: `isStatus`, `isLoadable`

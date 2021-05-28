@@ -5,7 +5,10 @@
     ],
     "include": [
         "src/**/*",
-        "tests/types.ts",
+        
+        // Note: don't enable anything outside of `src`, because it will change the location of the files in `typings`,
+        // since tsconfig.decl.json inherits from this config (and we cannot override the `include` paths there).
+        //"tests/types.ts",
     ],
     "compilerOptions": {
         "noEmit": true,
