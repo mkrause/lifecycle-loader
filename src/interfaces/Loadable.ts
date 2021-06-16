@@ -37,9 +37,9 @@ const defaultStatus : Status = { ready: false, loading: false, error: null };
 
 
 // Property key symbols
-export const itemKey = Symbol.for('lifecycle.loadable.item');
-export const statusKey = Symbol.for('lifecycle.loadable.status');
-export const constructKey = Symbol.for('lifecycle.loadable.construct');
+export const itemKey: unique symbol = Symbol.for('lifecycle.loadable.item');
+export const statusKey: unique symbol = Symbol.for('lifecycle.loadable.status');
+export const constructKey: unique symbol = Symbol.for('lifecycle.loadable.construct');
 
 // A *resource* (or "Loadable") is an object that has both an item and a status.
 export type Loadable<T> = {

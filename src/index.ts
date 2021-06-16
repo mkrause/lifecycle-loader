@@ -17,9 +17,9 @@ export const Loadable = Object.assign(
         LoadableDefs.LoadableProxy(item, status),
     {
         // Keys
-        item: LoadableDefs.itemKey,
-        status: LoadableDefs.statusKey,
-        construct: LoadableDefs.constructKey,
+        item: LoadableDefs.itemKey as typeof LoadableDefs.itemKey,  // Prevent widening to `symbol`
+        status: LoadableDefs.statusKey as typeof LoadableDefs.statusKey,  // Prevent widening to `symbol`
+        construct: LoadableDefs.constructKey as typeof LoadableDefs.constructKey,  // Prevent widening to `symbol`
         
         isStatus: LoadableDefs.isStatus,
         isLoadable: LoadableDefs.isLoadable,
@@ -44,7 +44,7 @@ export const Loadable = Object.assign(
 );
 
 // Shorthand exports
-export const status = LoadableDefs.statusKey;
+export const status: typeof LoadableDefs.statusKey = LoadableDefs.statusKey; // Prevent widening to `symbol`
 export const isStatus = LoadableDefs.isStatus;
 export const isLoadable = LoadableDefs.isLoadable;
 
