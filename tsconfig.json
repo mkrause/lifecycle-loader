@@ -2,6 +2,8 @@
     "exclude": [
         "node_modules",
         "**/*.spec.ts",
+        // Don't check tsd test files (these will have expected errors to be handled by tsd instead)
+        "./tests/*.test-d.ts",
     ],
     "include": [
         "src/**/*",
@@ -12,9 +14,11 @@
     ],
     "compilerOptions": {
         "noEmit": true,
-        "lib": ["es2020"],
-        "allowJs": false,
+        "lib": ["es2021"],
         "strict": true,
-        "noErrorTruncation": true,
-    },
+        "exactOptionalPropertyTypes": true,
+        "allowImportingTsExtensions": true,
+        "moduleResolution": "node16",
+        //"noErrorTruncation": true,
+    }
 }

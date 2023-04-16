@@ -3,10 +3,9 @@ const env = process.env.BABEL_ENV || 'esm';
 
 module.exports = {
     targets: {
-        node: '12.13', // Support Node v12.13 LTS (Erbium) or higher
+        node: '14.15', // Support Node v14.15 (Fermium) LTS or higher
         browsers: [
             'defaults',
-            'not IE >= 0',
         ],
     },
     presets: [
