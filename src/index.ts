@@ -13,7 +13,7 @@ export type LoadableProxy<T extends Proxyable> = LoadableDefs.LoadableProxyT<T>;
 
 // Wrap up the definitions in a single `Loadable` object, which can also be invocated as a function (uses Proxy)
 export const Loadable = Object.assign(
-    <T extends Proxyable>(item ?: undefined | T, status : Partial<LoadableDefs.Status> = {}) =>
+    <T extends Proxyable>(item?: undefined | T, status: Partial<LoadableDefs.Status> = {}) =>
         LoadableDefs.LoadableProxy(item, status),
     {
         // Keys
@@ -29,8 +29,8 @@ export const Loadable = Object.assign(
         Proxy: LoadableDefs.LoadableProxy,
         
         // Accessor functions
-        getItem: <T>(resource : Loadable<T>) => resource[LoadableDefs.itemKey],
-        getStatus: <T>(resource : Loadable<T>) => resource[LoadableDefs.statusKey],
+        getItem: <T>(resource: Loadable<T>) => resource[LoadableDefs.itemKey],
+        getStatus: <T>(resource: Loadable<T>) => resource[LoadableDefs.statusKey],
         
         // Updater functions
         update: LoadableDefs.update,
@@ -59,8 +59,8 @@ export {
 };
 
 export const loader = <T>(
-        item : Loadable<T>,
-        executor : (resolve : (item : Loadable<T>) => void, reject : (item : Loadable<T>) => void) => void,
+        item: Loadable<T>,
+        executor: (resolve: (item: Loadable<T>) => void, reject: (item: Loadable<T>) => void) => void,
     ) =>
         new LoadablePromise(executor, item);
 */

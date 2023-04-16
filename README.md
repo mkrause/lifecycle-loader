@@ -84,9 +84,9 @@ const userStatus = userResource[Loadable.status]; // { ready: true, loading: fal
 
 The *status* consists of the following flags:
 
-* `ready : boolean` Indicates whether there is an item present (i.e. whether there is data we can use).
-* `loading : boolean` Indicates whether this resource is currently being (re)loaded.
-* `error : null | Error` Contains the error for the most recent load attempt, or `null` if no error.
+* `ready: boolean` Indicates whether there is an item present (i.e. whether there is data we can use).
+* `loading: boolean` Indicates whether this resource is currently being (re)loaded.
+* `error: null | Error` Contains the error for the most recent load attempt, or `null` if no error.
 
 Each of these three flags are independent of each other. For example, a resource may be `ready` and yet have an `error` associated with it. In that case, the UI is able to read the item data to show on the screen, and also show the error to the user to indicate the newest data could not be fetched.
 
